@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_e7e20094bc485f10a4598ab8e061b424 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_e7e20094bc485f10a4598ab8e061b424" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_e7e20094bc485f10a4598ab8e061b424 = L.map(
+                "map_e7e20094bc485f10a4598ab8e061b424",
+                {
+                    center: [-34.60854928213016, -58.420043778191804],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 15,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_540a88978f2003ccdb76753411cab012 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_e7e20094bc485f10a4598ab8e061b424);
+        
+    
+            var circle_59aff23c67cfbf4d6b522b4016642024 = L.circle(
+                [-34.63561750108096, -58.364769713435194],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1000, "stroke": true, "weight": 3}
+            ).addTo(map_e7e20094bc485f10a4598ab8e061b424);
+        
+    
+            var circle_f1a0f11233ee53b90f5defd0f7c1247f = L.circle(
+                [-34.545272094172674, -58.449752491858995],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1000, "stroke": true, "weight": 3}
+            ).addTo(map_e7e20094bc485f10a4598ab8e061b424);
+        
+    
+            var marker_add288676cc33c71d7fbd40e99d453cc = L.marker(
+                [-34.60915405648046, -58.39196523234133],
+                {"color": "red"}
+            ).addTo(map_e7e20094bc485f10a4598ab8e061b424);
+        
+    
+            var icon_a00b79c1e07955e2d168447e51f839f0 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_add288676cc33c71d7fbd40e99d453cc.setIcon(icon_a00b79c1e07955e2d168447e51f839f0);
+        
+    
+        var popup_6112c0635e11fcf1b672205e062eea33 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_dc0c16674468e4c68db4918f7e6f635d = $(`<div id="html_dc0c16674468e4c68db4918f7e6f635d" style="width: 100.0%; height: 100.0%;">Name:callao_rivadavia </div>`)[0];
+                popup_6112c0635e11fcf1b672205e062eea33.setContent(html_dc0c16674468e4c68db4918f7e6f635d);
+            
+        
+
+        marker_add288676cc33c71d7fbd40e99d453cc.bindPopup(popup_6112c0635e11fcf1b672205e062eea33)
+        ;
+
+        
+    
+    
+            var marker_0ba671c8e6e70950d221bf4ee5ff3575 = L.marker(
+                [-34.59964035141302, -58.39294443564469],
+                {"color": "red"}
+            ).addTo(map_e7e20094bc485f10a4598ab8e061b424);
+        
+    
+            var icon_0fddc188edbcabfa0dce660ce6b2cb73 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_0ba671c8e6e70950d221bf4ee5ff3575.setIcon(icon_0fddc188edbcabfa0dce660ce6b2cb73);
+        
+    
+        var popup_1571ed3c89f9518da18339782fde8182 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_1a86aeba58df19d7a01657936f1f3338 = $(`<div id="html_1a86aeba58df19d7a01657936f1f3338" style="width: 100.0%; height: 100.0%;">Name:callao_cordoba </div>`)[0];
+                popup_1571ed3c89f9518da18339782fde8182.setContent(html_1a86aeba58df19d7a01657936f1f3338);
+            
+        
+
+        marker_0ba671c8e6e70950d221bf4ee5ff3575.bindPopup(popup_1571ed3c89f9518da18339782fde8182)
+        ;
+
+        
+    
+    
+            var marker_e670eea80eab374ddc06f29d2b0cc5eb = L.marker(
+                [-34.607710627889254, -58.37040150466133],
+                {"color": "red"}
+            ).addTo(map_e7e20094bc485f10a4598ab8e061b424);
+        
+    
+            var icon_0ffec96feb2dab3fe22c64b092278f1f = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_e670eea80eab374ddc06f29d2b0cc5eb.setIcon(icon_0ffec96feb2dab3fe22c64b092278f1f);
+        
+    
+        var popup_747adddc8e9a5512fa808dc9a69976c0 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_9bf416182c7e3cefe869ed0b8203996b = $(`<div id="html_9bf416182c7e3cefe869ed0b8203996b" style="width: 100.0%; height: 100.0%;">Name:alem_rivadavia </div>`)[0];
+                popup_747adddc8e9a5512fa808dc9a69976c0.setContent(html_9bf416182c7e3cefe869ed0b8203996b);
+            
+        
+
+        marker_e670eea80eab374ddc06f29d2b0cc5eb.bindPopup(popup_747adddc8e9a5512fa808dc9a69976c0)
+        ;
+
+        
+    
+    
+            var marker_0c047083d5a74b84605e82647e36b221 = L.marker(
+                [-34.59836493767683, -58.370976016505566],
+                {"color": "red"}
+            ).addTo(map_e7e20094bc485f10a4598ab8e061b424);
+        
+    
+            var icon_cb7ed7616c69ab05fc2e1803a34aaceb = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_0c047083d5a74b84605e82647e36b221.setIcon(icon_cb7ed7616c69ab05fc2e1803a34aaceb);
+        
+    
+        var popup_aee9a54396911305397ca09db6d629dc = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_82406e527044914376b7ecede056317a = $(`<div id="html_82406e527044914376b7ecede056317a" style="width: 100.0%; height: 100.0%;">Name:alem_cordoba' </div>`)[0];
+                popup_aee9a54396911305397ca09db6d629dc.setContent(html_82406e527044914376b7ecede056317a);
+            
+        
+
+        marker_0c047083d5a74b84605e82647e36b221.bindPopup(popup_aee9a54396911305397ca09db6d629dc)
+        ;
+
+        
+    
+</script>
+</html>

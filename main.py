@@ -47,8 +47,5 @@ def main():
     for i in range(len(datos)):
         texto_audio = speech_recognition_API(datos[i]['ruta_audio'])
         crear_csv(texto_audio)
-    
-    
-    
 
 main()

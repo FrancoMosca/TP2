@@ -5,6 +5,7 @@ import math
 import webbrowser
 import os
 
+
 #https://www.youtube.com/watch?v=jFaa2vwU4-M
 #https://getbootstrap.com/docs/3.3/components/
 """
@@ -15,6 +16,14 @@ print(haversine(coord1, coord2))
 print(dentro_radio(coord1, coord2, 1))
 print(ubicacion.latitude, ubicacion.longitude)
 print(ubicacion.address)
+
+print(direccion_coordenadas([-34.60915405648046, -58.39196523234133]))
+print("------------------------------------------------")
+print(direccion_coordenadas([-34.607710627889254, -58.370401504661324]))
+print("------------------------------------------------")
+print(direccion_coordenadas([-34.85419234590419, -59.06527098733429]))
+print("------------------------------------------------")
+print(direccion_coordenadas([-43.838774500287386, -18.283261888554332]))
 """
 
 def haversine(coordenada1, coordenada2):
@@ -80,6 +89,32 @@ def agregar_infraccion(caba, coordenadas, ruta_imagen):
                         icon=folium.Icon(color="red", icon = "exclamation-sign")
                         ).add_to(caba)
 
+def direccion_coordenadas(coordenadas):
+    coordenadas_str = str(coordenadas[0]) + ", " + str(coordenadas[1])
+    mini_dict = {}
+    localizador = Nominatim(user_agent="fede")
+    ubicacion = localizador.reverse(coordenadas_str)
+    if(ubicacion == None):
+        return(mini_dict)
+  
+    if(("road" in ubicacion.raw["address"]) and ("house_number" in ubicacion.raw["address"])):
+        #print(ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"])
+        mini_dict["direccion"] = ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"]
+
+    if("suburb" in ubicacion.raw["address"]):
+        mini_dict["localidad"] = ubicacion.raw["address"]["suburb"]
+
+    if("state" in ubicacion.raw["address"]):
+        mini_dict["provincia"] = ubicacion.raw["address"]["state"]
+
+    if("city" in ubicacion.raw["address"]):
+        mini_dict["ciudad"] = ubicacion.raw["address"]["city"]
+
+    if("country" in ubicacion.raw["address"]):
+        mini_dict["pais"] = ubicacion.raw["address"]["country"]
+
+    return(mini_dict)
+
 def main():
     bombonera = [-34.63561750108096, -58.364769713435194]
     monumental = [-34.545272094172674, -58.449752491858995]
@@ -91,9 +126,14 @@ def main():
         'alem_cordoba': [-34.59836493767683, -58.370976016505566]
     }
     
+    
+    
+
     caba = crear_mapa(centro_mapa, bombonera, monumental, cuadrante)
     agregar_infraccion(caba, centro_mapa, "373791.jpg")
     caba.save('index.html')
     webbrowser.open_new_tab('index.html')
 
+
+ 
 main()

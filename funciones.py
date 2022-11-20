@@ -69,8 +69,34 @@ def agregar_infraccion(caba, coordenadas, ruta_imagen):
                         <img src={ruta_imagen}  style="max-width:100%;max-height:100%">""", max_width=500), 
                         icon=folium.Icon(color="red", icon = "exclamation-sign")
                         ).add_to(caba)
+        
+def direccion_coordenadas(coordenadas):
+    coordenadas_str = str(coordenadas[0]) + ", " + str(coordenadas[1])
+    mini_dict = {}
+    localizador = Nominatim(user_agent="fede")
+    ubicacion = localizador.reverse(coordenadas_str)
+    if(ubicacion == None):
+        return mini_dict 
+  
+    if(("road" in ubicacion.raw["address"]) and ("house_number" in ubicacion.raw["address"])):
+        #print(ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"])
+        mini_dict["direccion"] = ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"]
 
-def crear_csv(Timestamp,Telefono,descripcion_texto,texto_audio):
+    if("suburb" in ubicacion.raw["address"]):
+        mini_dict["localidad"] = ubicacion.raw["address"]["suburb"]
+
+    if("state" in ubicacion.raw["address"]):
+        mini_dict["provincia"] = ubicacion.raw["address"]["state"]
+
+    if("city" in ubicacion.raw["address"]):
+        mini_dict["ciudad"] = ubicacion.raw["address"]["city"]
+
+    if("country" in ubicacion.raw["address"]):
+        mini_dict["pais"] = ubicacion.raw["address"]["country"]
+
+    return mini_dict
+
+def crear_csv(Timestamp,Telefono,direccion,localidad,provincia,descripcion_texto,texto_audio):
     headers: list = ['Timestamp','Telefono',
                     'Direccion de la infraccion',
                     'Localidad','Provincia',

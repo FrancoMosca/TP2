@@ -12,9 +12,12 @@ def main():
     }
     datos = funciones.procesamiento_csv()
     
+    
     for i in range(len(datos)):
+        coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
+        datos_coords = funciones.direccion_coordenadas(coordenadas)
         texto_audio = funciones.speech_recognition_API(datos[i]['ruta_audio'])
-        funciones.crear_csv(datos[i]['Timestamp'],datos[i]['Telefono_celular'],datos[i]['descripcion_texto'],texto_audio)
+        funciones.crear_csv(datos[i]['Timestamp'],datos[i]['Telefono_celular'],datos_coords['direccion'],datos_coords['localidad'],datos_coords['provincia'],datos[i]['descripcion_texto'],texto_audio)
 
     caba = funciones.crear_mapa(centro_mapa, bombonera, monumental, cuadrante)
     funciones.agregar_infraccion(caba, centro_mapa, "373791.jpg")

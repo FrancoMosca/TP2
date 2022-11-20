@@ -39,13 +39,12 @@ def procesamiento_csv() -> None:
                 "ruta_audio":linea[6]
             }
             datos_dict.append(dato)
-    return datos_dict
-        
+    return datos_dict  
 
 def main():
     datos = procesamiento_csv()
     for i in range(len(datos)):
-        texto_audio = speech_recognition_API(datos[i]['ruta_audio'])
+        texto_audio = speech_recognition_API(datos[i]['ruta_audio'][:-2])
         crear_csv(texto_audio)
 
 main()

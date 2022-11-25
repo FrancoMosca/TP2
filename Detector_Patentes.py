@@ -16,7 +16,7 @@ def borrarPantalla():
 def Detector_Placas(Imagen)->str:
 
     img = cv2.imread(Imagen,cv2.IMREAD_COLOR)
-    img = cv2.resize(img, (600,400) )
+    img = cv2.resize(img, (400,400) )
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
     gray = cv2.bilateralFilter(gray, 13, 15, 15) 
@@ -68,7 +68,7 @@ def Cargar_Yolo():
 
     net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
     classes = []
-    with open("coco.nombres", "r") as f:
+    with open("coco.names", "r") as f:
         classes = [line.strip() for line in f.readlines()] 
     
     output_layers = [layer_name for layer_name in net.getUnconnectedOutLayersNames()]
@@ -120,43 +120,47 @@ def Recorte(boxes, confs, class_ids, classes, img):
 
     indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
     font = cv2.FONT_HERSHEY_PLAIN
-    tam_max = boxes[indexes[0]][2]*boxes[indexes[0]][3]
+    
+    try:
+        tam_max = boxes[indexes[0]][2]*boxes[indexes[0]][3]
 
-    if tam_max<0:
-        tam_max=tam_max*-1
+        if tam_max<0:
+            tam_max=tam_max*-1
 
-    for i in range(len(boxes)):
-        if i in indexes:
-            x, y, w, h = boxes[i]
-            tam = w*h
+        for i in range(len(boxes)):
+            if i in indexes:
+                x, y, w, h = boxes[i]
+                tam = w*h
 
-            if tam<0:
-                tam=tam*-1
+                if tam<0:
+                    tam=tam*-1
 
-            if tam > tam_max:
-                tam_max = w*h
-                if tam_max<0:
-                    tam_max=tam_max*-1 
+                if tam > tam_max:
+                    tam_max = w*h
+                    if tam_max<0:
+                        tam_max=tam_max*-1 
 
-    for i in range(len(boxes)):
-        if i in indexes:
+        for i in range(len(boxes)):
+            if i in indexes:
 
-            x, y, w, h = boxes[i]
-            tam=w*h
+                x, y, w, h = boxes[i]
+                tam=w*h
 
-            if tam<0:
-                tam = w*h*-1
+                if tam<0:
+                    tam = w*h*-1
 
-            if tam==tam_max:
-                label = str(classes[class_ids[i]])
-                if label=="car" or label=="motorbike" or label=="truck" or label=="bus":
+                if tam==tam_max:
+                    label = str(classes[class_ids[i]])
+                    if label=="car" or label=="motorbike" or label=="truck" or label=="bus":
 
-                    cv2.imwrite("Imagen.png",img[y:y+h,x:x+w,:])
+                        cv2.imwrite("Imagen.png",img[y:y+h,x:x+w])
+    except:
+        print("La imagen ingresada no es correcta")
 
 def Validacion(boxes, confs, class_ids, classes)->bool:
 
     indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
-    font = cv2.FONT_HERSHEY_PLAIN
+    #font = cv2.FONT_HERSHEY_PLAINf
     Verificacion=False
 
     for i in range(len(boxes)):
@@ -179,19 +183,35 @@ def Detector(Imagen):
 
     return Verificacion
 
-def main():
+def Limpieza(Text:str)->str:
+    
+    Lista=list(Text)
 
-    Imagen = "Patente_1.png"
+    Permitidos=["Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Ñ","Z","X","C","V","B","N","M","0","1","2","3","4","5","6","7","8","9"]
+
+    Patente:list=[]
+
+    for i in Lista:
+        if i in Permitidos:
+
+            Patente.append(i)
+
+    Patente="".join(Patente)
+    return Patente
+
+
+def Patente(Imagen:str)->str:
+    
     Verificado = Detector(Imagen)
 
     if Verificado == True:
         text = Detector_Placas("Imagen.png")
         borrarPantalla()
         if text == "ERROR":
-            print("No se encontro una placa")
+            Patente = "No se encontro una placa"
         else:
-            print("La placa registrada es:",text)
+            Patente = Limpieza(text)
     else:
-        print("No se ha encontrado un auto en la imagen")
+        Patente = "No se ha encontrado un auto en la imagen"
 
-main()
+    return Patente

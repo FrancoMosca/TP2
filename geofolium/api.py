@@ -25,24 +25,27 @@ print(direccion_coordenadas([-34.85419234590419, -59.06527098733429]))
 print("------------------------------------------------")
 print(direccion_coordenadas([-43.838774500287386, -18.283261888554332]))
 """
-
-def haversine(coordenada1, coordenada2):
-    rad=math.pi/180
-    dlat=coordenada2[0] - coordenada1[0]
-    dlon=coordenada2[1] - coordenada1[1]
-    R=6372.795477598
-    a=(math.sin(rad*dlat/2))**2 + math.cos(rad*coordenada1[0])*math.cos(rad*coordenada2[0])*(math.sin(rad*dlon/2))**2
-    distancia=2*R*math.asin(math.sqrt(a))
+#Pre: recibe dos coordenadas en froma de pares dentro de una lista
+#Post: la funcion una la formula de haversine para devolver la distancia entro dos cordenadas contemplando una esfera
+def haversine(coordenada1:list, coordenada2:list) -> float:
+    rad:float = math.pi/180
+    dlat:float = coordenada2[0] - coordenada1[0]
+    dlon:float = coordenada2[1] - coordenada1[1]
+    R:float = 6372.795477598
+    a:float = (math.sin(rad*dlat/2))**2 + math.cos(rad*coordenada1[0])*math.cos(rad*coordenada2[0])*(math.sin(rad*dlon/2))**2
+    distancia:float = 2*R*math.asin(math.sqrt(a))
     return distancia
 
-#usar esta funcion para el radio
-def dentro_radio(coordenada1, coordenada2, radio) -> bool:
+#Pre: recibe dos coordenadas en froma de pares dentro de una lista
+#Post: devuelve true si la distancia entre las coordenadas es menor al radiod dado
+def dentro_radio(coordenada1:list, coordenada2:list, radio:float) -> bool:
     if(haversine(coordenada1, coordenada2) <= radio):
         return True
     return False
 
-
-def dentro_cuadrante(cuadrante, coordenada):
+#Pre: recibe una coordendas y un diccionario de 4 coordenadas que generan un ciadrante ya hardcodeadas
+#Post: devuelve true si la coordenada se encuentra dentro del cuadrante
+def dentro_cuadrante(cuadrante:list, coordenada:list) -> bool:
     if( coordenada[1] > cuadrante['callao_rivadavia'][1] 
         and coordenada[1] > cuadrante['callao_cordoba'][1]
         and coordenada[1] < cuadrante['alem_rivadavia'][1] 
@@ -56,6 +59,8 @@ def dentro_cuadrante(cuadrante, coordenada):
             return True
     return False
 
+#Pre: 3 coordenadas y el cuandrante, donde todas estan hardcodeadas    
+#Post: la funcion crea un mapa atravez de folium se genera con c3ntro en buenos aires y marca en el mapa los puntos datos
 def crear_mapa(centro_mapa, bombonera, monumental, cuadrante):
     caba = folium.Map(location=centro_mapa, zoom_start=13)
     
@@ -79,8 +84,11 @@ def crear_mapa(centro_mapa, bombonera, monumental, cuadrante):
 
     return caba
 
-def agregar_infraccion(caba, coordenadas, ruta_imagen):
-    isFile = os.path.isfile(ruta_imagen)
+
+#Pre: recibe el mapa, una coordenada y la ruta del archivo de imagen
+#Post: la funcion crea una infraccion en el mapa marcandolo en rojo, que al clicker se ve un popup con la imagen dada, si la imgen no existe o se le da None no hay popup
+def agregar_infraccion(caba, coordenadas:list, ruta_imagen:str):
+    isFile:bool = os.path.isfile(ruta_imagen)
     if(ruta_imagen == None or isFile == False):
         folium.Marker(location = coordenadas, icon=folium.Icon(color="red", icon = "exclamation-sign")).add_to(caba)
     else:
@@ -89,16 +97,18 @@ def agregar_infraccion(caba, coordenadas, ruta_imagen):
                         icon=folium.Icon(color="red", icon = "exclamation-sign")
                         ).add_to(caba)
 
-def direccion_coordenadas(coordenadas):
-    coordenadas_str = str(coordenadas[0]) + ", " + str(coordenadas[1])
-    mini_dict = {}
+        
+#Pre: la funcion recibe una coordenadas
+#Post: la funcion devuele un dicionario con los datos de la direccion dada a partir de las coordenadas
+def direccion_coordenadas(coordenadas:list) -> dict:
+    coordenadas_str:str = str(coordenadas[0]) + ", " + str(coordenadas[1])
+    mini_dict:dict = {}
     localizador = Nominatim(user_agent="fede")
     ubicacion = localizador.reverse(coordenadas_str)
     if(ubicacion == None):
         return(mini_dict)
   
     if(("road" in ubicacion.raw["address"]) and ("house_number" in ubicacion.raw["address"])):
-        #print(ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"])
         mini_dict["direccion"] = ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"]
 
     if("suburb" in ubicacion.raw["address"]):
@@ -126,9 +136,6 @@ def main():
         'alem_cordoba': [-34.59836493767683, -58.370976016505566]
     }
     
-    
-    
-
     caba = crear_mapa(centro_mapa, bombonera, monumental, cuadrante)
     agregar_infraccion(caba, centro_mapa, "373791.jpg")
     caba.save('index.html')

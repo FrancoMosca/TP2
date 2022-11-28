@@ -107,6 +107,7 @@ def crear_csv(data):
         write = csv.writer(f)
         write.writerow(headers)
         write.writerows(data)
+        
    
 def speech_recognition_API(ruta_audio) -> str:
     r = sr.Recognizer()
@@ -122,6 +123,7 @@ def procesamiento_csv() -> list[dict]:
     with open('datos.csv','r',newline='') as datos:
         next(datos)
         for linea in datos:
+            linea = linea.rstrip()
             linea = linea.split(',')
             dato = {
                 "Timestamp":linea[0],
@@ -227,7 +229,7 @@ def contador_denuncias(datos)-> dict:
             
     return cantidad_de_denuncias
 
-def menu(datos,coordenadas_dict)-> None:
+def menu(datos,coordenadas_dict,caba)-> None:
     opcion = 0
     while not(opcion == 5):
         print(' 1. Mostrar denuncias realizadas a 1km de los estadios')
@@ -250,6 +252,8 @@ def menu(datos,coordenadas_dict)-> None:
             
         elif (opcion==4):
             print(' **** menu opcion 04 ****')
+            caba.save('index.html')
+            webbrowser.open_new_tab('index.html')
                     
         elif (opcion==5):
             cantidad_de_denuncias = contador_denuncias(datos)

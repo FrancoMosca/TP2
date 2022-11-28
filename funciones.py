@@ -6,6 +6,8 @@ import webbrowser
 import os
 import csv
 import speech_recognition as sr
+import matplotlib.pyplot as gf
+
 
 def haversine(coordenada1, coordenada2):
     rad=math.pi/180
@@ -79,7 +81,6 @@ def direccion_coordenadas(coordenadas):
         return mini_dict 
   
     if(("road" in ubicacion.raw["address"]) and ("house_number" in ubicacion.raw["address"])):
-        #print(ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"])
         mini_dict["direccion"] = ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"]
 
     if("suburb" in ubicacion.raw["address"]):
@@ -96,17 +97,16 @@ def direccion_coordenadas(coordenadas):
 
     return mini_dict
 
-def crear_csv(Timestamp,Telefono,direccion,localidad,provincia,descripcion_texto,texto_audio):
+def crear_csv(data):
     headers: list = ['Timestamp','Telefono',
                     'Direccion de la infraccion',
                     'Localidad','Provincia',
                     'Patente','descripcion texto',
                     'descripcion audio']
-    registro = open("registro.csv", "w")
-    writer = csv.DictWriter(
-        registro, fieldnames= headers)
-    writer.writeheader()
-    registro.close()
+    with open('registro.csv', 'w') as f:
+        write = csv.writer(f)
+        write.writerow(headers)
+        write.writerows(data)
    
 def speech_recognition_API(ruta_audio) -> str:
     r = sr.Recognizer()
@@ -114,10 +114,9 @@ def speech_recognition_API(ruta_audio) -> str:
         r.adjust_for_ambient_noise(source)
         audio : str = r.listen(source)
         texto_audio : str = r.recognize_google(audio,language='es-AR')
-        print(texto_audio)
-    
     return texto_audio
 
+#Punto 1
 def procesamiento_csv() -> list[dict]:
     datos_dict : list[dict] = []
     with open('datos.csv','r',newline='') as datos:
@@ -135,3 +134,130 @@ def procesamiento_csv() -> list[dict]:
             }
             datos_dict.append(dato)
     return datos_dict
+
+def procesar_radio(datos,coordenadas_dict):
+    for i in range(len(datos)):
+        coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
+        for i in range(2):
+            if dentro_radio(coordenadas,coordenadas_dict['bombonera'],1000):
+                print("entre")
+            if dentro_radio(coordenadas,coordenadas_dict['monumental'],1000):
+                print("entre")
+           
+def procesar_cuadrante(datos,coordenadas_dict):
+    for i in range(len(datos)):
+        coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
+        if dentro_cuadrante(coordenadas_dict['cuadrante'],coordenadas):
+            print("entre")
+    
+def formatear_datos_csv(datos,caba):
+    datos_csv: list[list] = []
+    
+    for i in range(len(datos)):
+        formato_csv: list = []
+        coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
+        datos_coords = direccion_coordenadas(coordenadas)
+        texto_audio = speech_recognition_API((datos[i]['ruta_audio']).rstrip())
+        
+        formato_csv.append(datos[i]['Timestamp'])
+        formato_csv.append(datos[i]['Telefono_celular'])
+        formato_csv.append(datos_coords['direccion'])
+        formato_csv.append(datos_coords['localidad'])
+        formato_csv.append(datos_coords['provincia'])
+        formato_csv.append('0')
+        formato_csv.append('0')
+        formato_csv.append(texto_audio)
+        
+        datos_csv.append(formato_csv)
+        
+        agregar_infraccion(caba, coordenadas, datos[i]['ruta_foto'])
+        
+    return datos_csv
+
+def grafico_xy(xy):
+    gf.plot(xy.keys(), xy.values())
+    gf.title('Cantidad de denuncias mensuales')
+    gf.xlabel('Mes')
+    gf.ylabel('Cantidad de denuncias')
+    gf.xticks(rotation=90,fontsize=9)
+    gf.show()
+    
+def contador_denuncias(datos)-> dict:
+    cantidad_de_denuncias: dict = {
+        'Enero':0,
+        'Febrero':0,
+        'Marzo':0,
+        'Abril':0,
+        'Mayo':0,
+        'Junio':0,
+        'Julio':0,
+        'Agosto':0,
+        'Septiembre':0,
+        'Octubre':0,
+        'Noviembre':0,
+        'Diciembre':0   
+    }
+    mes = '0'
+    for i in range(len(datos)):
+        mes = str(datos[i]['Timestamp'][16] + datos[i]['Timestamp'][17])
+        if mes == '01':
+            cantidad_de_denuncias['Enero'] += 1
+        elif mes == '02':
+            cantidad_de_denuncias['Febrero'] += 1
+        elif mes == '03':
+            cantidad_de_denuncias['Marzo'] += 1
+        elif mes == '04':
+            cantidad_de_denuncias['Abril'] += 1
+        elif mes == '05':
+            cantidad_de_denuncias['Mayo'] += 1
+        elif mes == '06':
+            cantidad_de_denuncias['Junio'] += 1
+        elif mes == '07':
+            cantidad_de_denuncias['Julio'] += 1
+        elif mes == '08':
+            cantidad_de_denuncias['Agosto'] += 1
+        elif mes == '09':
+            cantidad_de_denuncias['Septiembre'] += 1
+        elif mes == '10':
+            cantidad_de_denuncias['Octubre'] += 1
+        elif mes == '11':
+            cantidad_de_denuncias['Noviembre'] += 1
+        else:
+            cantidad_de_denuncias['Diciembre'] += 1
+            
+    return cantidad_de_denuncias
+
+def menu(datos,coordenadas_dict)-> None:
+    opcion = 0
+    while not(opcion == 5):
+        print(' 1. Mostrar denuncias realizadas a 1km de los estadios')
+        print(' 2. Mostrar todas las infracciones dentro del centro de la ciudad')
+        print(' 3. Autos robados')
+        print(' 4. Ingresar una patente')
+        print(' 5. Mostras mapa cantidad de denuncias recibidas')
+        print(' 6. Salir')
+
+        opcion=int(input("Que accion desea realizar?: "))
+        
+        if (opcion==1):
+            procesar_radio(datos,coordenadas_dict)
+            
+        elif (opcion==2):
+            procesar_cuadrante(datos,coordenadas_dict['cuadrante'])
+            
+        elif (opcion==3):
+            print(' **** menu opcion 03 ****')
+            
+        elif (opcion==4):
+            print(' **** menu opcion 04 ****')
+                    
+        elif (opcion==5):
+            cantidad_de_denuncias = contador_denuncias(datos)
+            grafico_xy(cantidad_de_denuncias)
+        elif (opcion==6):
+            print(' **** Saliendo del menu  ****')   
+        else:
+            print('No existe la opcion')
+        
+
+    

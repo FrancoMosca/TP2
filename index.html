@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_44e89c7f67ad78a81fe8fe068c6e2ea2 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_44e89c7f67ad78a81fe8fe068c6e2ea2" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_44e89c7f67ad78a81fe8fe068c6e2ea2 = L.map(
+                "map_44e89c7f67ad78a81fe8fe068c6e2ea2",
+                {
+                    center: [-34.60854928213016, -58.420043778191804],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 13,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_467febad5eeceb31e9ce64b24c6a666b = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var circle_e64872d906a6b3c75941cbc1b4e12f93 = L.circle(
+                [-34.63561750108096, -58.364769713435194],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1000, "stroke": true, "weight": 3}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var circle_11fec029a7713f0df40255191d9be4da = L.circle(
+                [-34.545272094172674, -58.449752491858995],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1000, "stroke": true, "weight": 3}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var marker_ef7abd3ae9c65943890f8dbdfda40483 = L.marker(
+                [-34.63561750108096, -58.364769713435194],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_55d5b0638178985176cf4a53b7a593b1 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "home", "iconColor": "white", "markerColor": "blue", "prefix": "glyphicon"}
+            );
+            marker_ef7abd3ae9c65943890f8dbdfda40483.setIcon(icon_55d5b0638178985176cf4a53b7a593b1);
+        
+    
+        var popup_cc9af627f1202a9c696191f46fa85308 = L.popup({"maxWidth": 500});
+
+        
+            
+                var html_c14cd3bbf1a556e42483b4facd60fb73 = $(`<div id="html_c14cd3bbf1a556e42483b4facd60fb73" style="width: 100.0%; height: 100.0%;"><h1>La bombonera</h1><br/>                     <img src="bombonera.jpg"  style="max-width:100%;max-height:100%"></div>`)[0];
+                popup_cc9af627f1202a9c696191f46fa85308.setContent(html_c14cd3bbf1a556e42483b4facd60fb73);
+            
+        
+
+        marker_ef7abd3ae9c65943890f8dbdfda40483.bindPopup(popup_cc9af627f1202a9c696191f46fa85308)
+        ;
+
+        
+    
+    
+            var marker_a5f97210b0daaefa59a9f93106760115 = L.marker(
+                [-34.545272094172674, -58.449752491858995],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_216b0034158ea804bb540be91707d5f8 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "home", "iconColor": "white", "markerColor": "blue", "prefix": "glyphicon"}
+            );
+            marker_a5f97210b0daaefa59a9f93106760115.setIcon(icon_216b0034158ea804bb540be91707d5f8);
+        
+    
+        var popup_0001c588d39cee0e7628f0430d8bdda8 = L.popup({"maxWidth": 500});
+
+        
+            
+                var html_cf5077983867e9e7499bf74e8acc9d88 = $(`<div id="html_cf5077983867e9e7499bf74e8acc9d88" style="width: 100.0%; height: 100.0%;"><h1>El monumental</h1><br/>                     <img src="monumental.jpg"  style="max-width:100%;max-height:100%"></div>`)[0];
+                popup_0001c588d39cee0e7628f0430d8bdda8.setContent(html_cf5077983867e9e7499bf74e8acc9d88);
+            
+        
+
+        marker_a5f97210b0daaefa59a9f93106760115.bindPopup(popup_0001c588d39cee0e7628f0430d8bdda8)
+        ;
+
+        
+    
+    
+            var marker_f935ea94a592e4e57287a70305ba17c2 = L.marker(
+                [-34.60915405648046, -58.39196523234133],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_ccf1e9d4b1f7a391dc85e6279628f9c5 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "pushpin", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_f935ea94a592e4e57287a70305ba17c2.setIcon(icon_ccf1e9d4b1f7a391dc85e6279628f9c5);
+        
+    
+        var popup_02222587f69872f4ac2d19c5aa39471c = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_2f8d2baa1c58068c9bd998ade008021f = $(`<div id="html_2f8d2baa1c58068c9bd998ade008021f" style="width: 100.0%; height: 100.0%;"><h1>Callao y Rivadavia</h1><br/></div>`)[0];
+                popup_02222587f69872f4ac2d19c5aa39471c.setContent(html_2f8d2baa1c58068c9bd998ade008021f);
+            
+        
+
+        marker_f935ea94a592e4e57287a70305ba17c2.bindPopup(popup_02222587f69872f4ac2d19c5aa39471c)
+        ;
+
+        
+    
+    
+            var marker_c3a0e852444d9cb95c1d101239547805 = L.marker(
+                [-34.59964035141302, -58.392944435644694],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_212c27bb7f7b8d318b1820769d881a3b = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "pushpin", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_c3a0e852444d9cb95c1d101239547805.setIcon(icon_212c27bb7f7b8d318b1820769d881a3b);
+        
+    
+        var popup_43115297cd92cd80d372d0b0b3a082cf = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_6b6ac2e15fc90da1b4e356184c091772 = $(`<div id="html_6b6ac2e15fc90da1b4e356184c091772" style="width: 100.0%; height: 100.0%;"><h1>Callao y Cordoba</h1><br/></div>`)[0];
+                popup_43115297cd92cd80d372d0b0b3a082cf.setContent(html_6b6ac2e15fc90da1b4e356184c091772);
+            
+        
+
+        marker_c3a0e852444d9cb95c1d101239547805.bindPopup(popup_43115297cd92cd80d372d0b0b3a082cf)
+        ;
+
+        
+    
+    
+            var marker_16f11e74a938b2bdc55e8c88ceb27625 = L.marker(
+                [-34.607710627889254, -58.370401504661324],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_30fda5ff8a1f84bc619f62b034b6393d = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "pushpin", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_16f11e74a938b2bdc55e8c88ceb27625.setIcon(icon_30fda5ff8a1f84bc619f62b034b6393d);
+        
+    
+        var popup_ef5c0d1404d70c41e152607e39e0b66f = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_a54f6d2f2660180b03a1eadf853afb40 = $(`<div id="html_a54f6d2f2660180b03a1eadf853afb40" style="width: 100.0%; height: 100.0%;"><h1>Alem y Rivadavia</h1><br/></div>`)[0];
+                popup_ef5c0d1404d70c41e152607e39e0b66f.setContent(html_a54f6d2f2660180b03a1eadf853afb40);
+            
+        
+
+        marker_16f11e74a938b2bdc55e8c88ceb27625.bindPopup(popup_ef5c0d1404d70c41e152607e39e0b66f)
+        ;
+
+        
+    
+    
+            var marker_22a81ac56e21c6bd8edba466735f3e8b = L.marker(
+                [-34.59836493767683, -58.370976016505566],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_2112b4892b3a7149b659b65f121d07c4 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "pushpin", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_22a81ac56e21c6bd8edba466735f3e8b.setIcon(icon_2112b4892b3a7149b659b65f121d07c4);
+        
+    
+        var popup_06de22effc2ab81a1669df23706c9d7d = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_2b323f1e9d2bea91e370bed9871d02e2 = $(`<div id="html_2b323f1e9d2bea91e370bed9871d02e2" style="width: 100.0%; height: 100.0%;"><h1>Alem y Cordoba</h1><br/></div>`)[0];
+                popup_06de22effc2ab81a1669df23706c9d7d.setContent(html_2b323f1e9d2bea91e370bed9871d02e2);
+            
+        
+
+        marker_22a81ac56e21c6bd8edba466735f3e8b.bindPopup(popup_06de22effc2ab81a1669df23706c9d7d)
+        ;
+
+        
+    
+    
+            var marker_741e11935b7797f2a9e31e4dcb649ef2 = L.marker(
+                [-34.548855, -58.449768],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_1e7afc48fbb64ea9de3af8865c1d210a = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "exclamation-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_741e11935b7797f2a9e31e4dcb649ef2.setIcon(icon_1e7afc48fbb64ea9de3af8865c1d210a);
+        
+    
+            var marker_eb6a2e01870a88695aeef17f46d27adb = L.marker(
+                [-34.635269, -58.371979],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_f09bb30a33b47c2e30851436484613bf = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "exclamation-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_eb6a2e01870a88695aeef17f46d27adb.setIcon(icon_f09bb30a33b47c2e30851436484613bf);
+        
+    
+            var marker_a563466584bfd72be06ca2cd810ff88e = L.marker(
+                [-34.613343, -58.403512],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_aca39149b135a3a48e9e12d1ab571ba6 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "exclamation-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_a563466584bfd72be06ca2cd810ff88e.setIcon(icon_aca39149b135a3a48e9e12d1ab571ba6);
+        
+    
+            var marker_4407f5da4e123547865395908b6d4bc9 = L.marker(
+                [-34.556478, -58.455385],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_8edd36238907e29df0d83cf36a942a75 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "exclamation-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_4407f5da4e123547865395908b6d4bc9.setIcon(icon_8edd36238907e29df0d83cf36a942a75);
+        
+    
+            var marker_31920d3f6ca1892af2ac75cf7c8e8b3a = L.marker(
+                [-34.606351, -58.383409],
+                {}
+            ).addTo(map_44e89c7f67ad78a81fe8fe068c6e2ea2);
+        
+    
+            var icon_c38e9e22b10e53411c6044828024ae4c = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "exclamation-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_31920d3f6ca1892af2ac75cf7c8e8b3a.setIcon(icon_c38e9e22b10e53411c6044828024ae4c);
+        
+</script>
+</html>

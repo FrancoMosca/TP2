@@ -1,50 +1,23 @@
-import csv
-import speech_recognition as sr
-
-def crear_csv(texto_audio):
-    headers: list = ['Timestamp','Telefono',
-                    'Direccion de la infraccion',
-                    'Localidad','Provincia',
-                    'Patente','descripcion texto',
-                    'descripcion audio']
-    registro = open("registro.csv", "w")
-    writer = csv.DictWriter(
-        registro, fieldnames= headers)
-    writer.writeheader()
-    registro.close()
-   
-def speech_recognition_API(ruta_audio) -> str:
-    r = sr.Recognizer()
-    with sr.AudioFile(ruta_audio) as source:
-        r.adjust_for_ambient_noise(source)
-        audio : str = r.listen(source)
-        texto_audio : str = r.recognize_google(audio,language='es-AR')
-        print(texto_audio)
-    
-    return texto_audio
-
-def procesamiento_csv() -> None:
-    datos_dict : list[dict] = []
-    with open('datos.csv','r',newline='') as datos:
-        next(datos)
-        for linea in datos:
-            linea = linea.split(',')
-            dato = {
-                "Timestamp":linea[0],
-                "Telefono_celular":linea[1],
-                "coord_latitud":linea[2],
-                "coord_long":linea[3],
-                "ruta_foto":linea[4],
-                "descripcion_texto":linea[5],
-                "ruta_audio":linea[6]
-            }
-            datos_dict.append(dato)
-    return datos_dict  
+import funciones
 
 def main():
-    datos = procesamiento_csv()
-    for i in range(len(datos)):
-        texto_audio = speech_recognition_API(datos[i]['ruta_audio'][:-2])
-        crear_csv(texto_audio)
+    coordenadas_dict: dict = {
+            'bombonera' : [-34.63561750108096, -58.364769713435194],
+            'monumental': [-34.545272094172674, -58.449752491858995],
+            'centro_mapa': [-34.60854928213016, -58.420043778191804], 
+            'cuadrante': {
+                'callao_rivadavia': [-34.60915405648046, -58.39196523234133],
+                'callao_cordoba': [-34.59964035141302, -58.392944435644694],
+                'alem_rivadavia': [-34.607710627889254, -58.370401504661324],
+                'alem_cordoba': [-34.59836493767683, -58.370976016505566]
+                }      
+    }
+    datos = funciones.procesamiento_csv()
+    caba = funciones.crear_mapa(coordenadas_dict['centro_mapa'],coordenadas_dict['bombonera'],coordenadas_dict['monumental'],coordenadas_dict['cuadrante'])
+    datos_csv = funciones.formatear_datos_csv(datos,caba)
+    funciones.crear_csv(datos_csv)   
+    # caba.save('index.html')
+    # funciones.webbrowser.open_new_tab('index.html')
+    funciones.menu(datos,coordenadas_dict)
 
 main()

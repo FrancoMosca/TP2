@@ -16,8 +16,6 @@ def main():
     caba = funciones.crear_mapa(coordenadas_dict['centro_mapa'],coordenadas_dict['bombonera'],coordenadas_dict['monumental'],coordenadas_dict['cuadrante'])
     datos_csv = funciones.formatear_datos_csv(datos,caba)
     funciones.crear_csv(datos_csv)   
-    # caba.save('index.html')
-    # funciones.webbrowser.open_new_tab('index.html')
     funciones.menu(datos,coordenadas_dict)
 
 main()

@@ -7,6 +7,7 @@ import os
 import csv
 import speech_recognition as sr
 import matplotlib.pyplot as gf
+import Detector_Patentes as dp
 
 
 def haversine(coordenada1, coordenada2):
@@ -152,7 +153,6 @@ def procesar_cuadrante(datos,coordenadas_dict):
     
 def formatear_datos_csv(datos,caba):
     datos_csv: list[list] = []
-    
     for i in range(len(datos)):
         formato_csv: list = []
         coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
@@ -164,8 +164,8 @@ def formatear_datos_csv(datos,caba):
         formato_csv.append(datos_coords['direccion'])
         formato_csv.append(datos_coords['localidad'])
         formato_csv.append(datos_coords['provincia'])
-        formato_csv.append('0')
-        formato_csv.append('0')
+        formato_csv.append(dp.Patente(datos[i]['ruta_foto']))
+        formato_csv.append(datos[i]['descripcion_texto'])
         formato_csv.append(texto_audio)
         
         datos_csv.append(formato_csv)

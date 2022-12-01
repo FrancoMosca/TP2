@@ -1,14 +1,14 @@
 Timestamp,Telefono,coord_latitud,coord_longitud,ruta_foto,descripcion_texto,ruta_audio
-1083339431(2004-04-30 15:37:11),1134517466,-34.548855,-58.449768,/home/gaby/Escritorio/TP2/Autos/Patente_1.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1105283415(2005-01-09 15:10:15),1147722406,-34.635269,-58.371979,/home/gaby/Escritorio/TP2/Autos/Patente_2.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1307113640(2011-06-03 15:07:20),1146509262,-34.613343,-58.403512,/home/gaby/Escritorio/TP2/Autos/Patente_3.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1146058861(2006-04-26 13:41:01),1114830934,-34.556478,-58.455385,/home/gaby/Escritorio/TP2/Autos/Patente_4.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1169647298(2007-12-24 14:01:38),1147933598,-34.606351,-58.383409,/home/gaby/Escritorio/TP2/Autos/Patente_5.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1152648294(2008-05-15 14:30:10),1135412412,-34.601417,-58.471224,/home/gaby/Escritorio/TP2/Autos/Patente_6.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1056963651(2012-01-01 13:09:06),1135522162,-34.601808,-58.390290,/home/gaby/Escritorio/TP2/Autos/Patente_7.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1342262614(2020-05-22 13:02:20),1122664523,-34.633932,-58.365040,/home/gaby/Escritorio/TP2/Autos/Patente_8.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1225566245(2018-05-11 12:37:08),1166325132,-34.635899,-58.368202,/home/gaby/Escritorio/TP2/Autos/Patente_9.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1102565541(2005-06-24 14:10:33),1114526256,-34.631631,-58.455116,/home/gaby/Escritorio/TP2/Autos/Patente_10.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1024357126(2007-07-27 14:26:10),1195123526,-34.548457,-58.452195,/home/gaby/Escritorio/TP2/Autos/Patente_11.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1125953145(2014-04-12 14:08:01),1135626478,-34.608049,-58.393085,/home/gaby/Escritorio/TP2/Autos/Patente_12.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
-1426235128(2010-02-29 13:01:19),1195820232,-34.541395,-58.445132,/home/gaby/Escritorio/TP2/Autos/Patente_13.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2004-04-30 15:37:11,1134517466,-34.548855,-58.449768,/home/gaby/Escritorio/TP2/Autos/Patente_1.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2005-01-09 15:10:15,1147722406,-34.635269,-58.371979,/home/gaby/Escritorio/TP2/Autos/Patente_2.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2011-06-03 15:07:20,1146509262,-34.613343,-58.403512,/home/gaby/Escritorio/TP2/Autos/Patente_3.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2006-04-26 13:41:01,1114830934,-34.556478,-58.455385,/home/gaby/Escritorio/TP2/Autos/Patente_4.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2007-12-24 14:01:38,1147933598,-34.606351,-58.383409,/home/gaby/Escritorio/TP2/Autos/Patente_5.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2008-05-15 14:30:10,1135412412,-34.601417,-58.471224,/home/gaby/Escritorio/TP2/Autos/Patente_6.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2012-01-01 13:09:06,1135522162,-34.601808,-58.390290,/home/gaby/Escritorio/TP2/Autos/Patente_7.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2020-05-22 13:02:20,1122664523,-34.633932,-58.365040,/home/gaby/Escritorio/TP2/Autos/Patente_8.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2018-05-11 12:37:08,1166325132,-34.635899,-58.368202,/home/gaby/Escritorio/TP2/Autos/Patente_9.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2005-06-24 14:10:33,1114526256,-34.631631,-58.455116,/home/gaby/Escritorio/TP2/Autos/Patente_10.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2007-07-27 14:26:10,1195123526,-34.548457,-58.452195,/home/gaby/Escritorio/TP2/Autos/Patente_11.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2014-04-12 14:08:01,1135626478,-34.608049,-58.393085,/home/gaby/Escritorio/TP2/Autos/Patente_12.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav
+2010-03-20 13:01:19,1195820232,-34.541395,-58.445132,/home/gaby/Escritorio/TP2/Autos/Patente_13.jpeg,0,/home/gaby/Escritorio/TP2/PrimerAudio.wav

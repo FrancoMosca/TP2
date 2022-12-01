@@ -8,6 +8,7 @@ import csv
 import speech_recognition as sr
 import matplotlib.pyplot as gf
 import Detector_Patentes as dp
+import datetime
 
 
 def haversine(coordenada1, coordenada2):
@@ -152,11 +153,6 @@ def procesar_radio(datos,coordenadas_dict):
 
     for i in range(len(datos)):
         coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
-        #for i in range(2):
-        #    if dentro_radio(coordenadas,coordenadas_dict['bombonera'],1000):
-        #        print("entre")
-        #    if dentro_radio(coordenadas,coordenadas_dict['monumental'],1000):
-        #        print("entre")
         if dentro_radio(coordenadas,coordenadas_dict['monumental'],1):
             print(f"El auto: {Patentes[i]} se encuentra a 1km de la monumental")
         elif dentro_radio(coordenadas,coordenadas_dict['bombonera'],1):
@@ -227,28 +223,30 @@ def contador_denuncias(datos)-> dict:
     }
     mes = '0'
     for i in range(len(datos)):
-        mes = str(datos[i]['Timestamp'][16] + datos[i]['Timestamp'][17])
-        if mes == '01':
+        fecha = datetime.datetime.strptime(datos[i]['Timestamp'],'%Y-%m-%d %H:%M:%S')
+        mes = fecha.month
+        
+        if mes == 1:
             cantidad_de_denuncias['Enero'] += 1
-        elif mes == '02':
+        elif mes == 2:
             cantidad_de_denuncias['Febrero'] += 1
-        elif mes == '03':
+        elif mes == 3:
             cantidad_de_denuncias['Marzo'] += 1
-        elif mes == '04':
+        elif mes == 4:
             cantidad_de_denuncias['Abril'] += 1
-        elif mes == '05':
+        elif mes == 5:
             cantidad_de_denuncias['Mayo'] += 1
-        elif mes == '06':
+        elif mes == 6:
             cantidad_de_denuncias['Junio'] += 1
-        elif mes == '07':
+        elif mes == 7:
             cantidad_de_denuncias['Julio'] += 1
-        elif mes == '08':
+        elif mes == 8:
             cantidad_de_denuncias['Agosto'] += 1
-        elif mes == '09':
+        elif mes == 9:
             cantidad_de_denuncias['Septiembre'] += 1
-        elif mes == '10':
+        elif mes == 10:
             cantidad_de_denuncias['Octubre'] += 1
-        elif mes == '11':
+        elif mes == 11:
             cantidad_de_denuncias['Noviembre'] += 1
         else:
             cantidad_de_denuncias['Diciembre'] += 1
@@ -306,7 +304,6 @@ def Busqueda_Patente(centro_mapa,coordenadas_dict):
                 cont = cont+1
 
         dp.Abrir_Imagen(ruta)
-        #mapa = Localizacion_Auto(,centro_mapa,coordenadas)
         mapa = crear_mapa(coordenadas,coordenadas_dict['bombonera'],coordenadas_dict['monumental'],coordenadas_dict['cuadrante'])
         agregar_infraccion(mapa,coordenadas,ruta)
         mapa.save('Ubi_Auto.html')

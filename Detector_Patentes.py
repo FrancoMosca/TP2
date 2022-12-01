@@ -246,3 +246,15 @@ def Patente(Imagen:str)->str:
         Patente = "No se ha encontrado un auto en la imagen"
 
     return Patente
+
+
+def Abrir_Imagen(Imagen):
+    """
+    Precondiciones: Debe existir la imagen
+    """
+
+    img = cv2.imread(Imagen,cv2.IMREAD_COLOR)
+    img = cv2.resize(img, None, fx=0.4, fy=0.4)
+    cv2.imshow('Auto.jpg',img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()

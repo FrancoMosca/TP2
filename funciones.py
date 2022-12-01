@@ -10,27 +10,23 @@ import matplotlib.pyplot as gf
 import Detector_Patentes as dp
 
 
-#Pre: recibe dos coordenadas en froma de pares dentro de una lista
-#Post: la funcion una la formula de haversine para devolver la distancia entro dos cordenadas contemplando una esfera
-def haversine(coordenada1:list, coordenada2:list) -> float:
-    rad:float = math.pi/180
-    dlat:float = coordenada2[0] - coordenada1[0]
-    dlon:float = coordenada2[1] - coordenada1[1]
-    R:float = 6372.795477598
-    a:float = (math.sin(rad*dlat/2))**2 + math.cos(rad*coordenada1[0])*math.cos(rad*coordenada2[0])*(math.sin(rad*dlon/2))**2
-    distancia:float = 2*R*math.asin(math.sqrt(a))
+def haversine(coordenada1, coordenada2):
+    rad=math.pi/180
+    dlat=coordenada2[0] - coordenada1[0]
+    dlon=coordenada2[1] - coordenada1[1]
+    R=6372.795477598
+    a=(math.sin(rad*dlat/2))**2 + math.cos(rad*coordenada1[0])*math.cos(rad*coordenada2[0])*(math.sin(rad*dlon/2))**2
+    distancia=2*R*math.asin(math.sqrt(a))
     return distancia
 
-#Pre: recibe dos coordenadas en froma de pares dentro de una lista
-#Post: devuelve true si la distancia entre las coordenadas es menor al radiod dado
-def dentro_radio(coordenada1:list, coordenada2:list, radio:float) -> bool:
+#usar esta funcion para el radio
+def dentro_radio(coordenada1, coordenada2, radio) -> bool:
     if(haversine(coordenada1, coordenada2) <= radio):
         return True
     return False
 
-#Pre: recibe una coordendas y un diccionario de 4 coordenadas que generan un ciadrante ya hardcodeadas
-#Post: devuelve true si la coordenada se encuentra dentro del cuadrante
-def dentro_cuadrante(cuadrante:list, coordenada:list) -> bool:
+
+def dentro_cuadrante(cuadrante, coordenada):
     if( coordenada[1] > cuadrante['callao_rivadavia'][1] 
         and coordenada[1] > cuadrante['callao_cordoba'][1]
         and coordenada[1] < cuadrante['alem_rivadavia'][1] 
@@ -44,8 +40,6 @@ def dentro_cuadrante(cuadrante:list, coordenada:list) -> bool:
             return True
     return False
 
-#Pre: 3 coordenadas y el cuandrante, donde todas estan hardcodeadas    
-#Post: la funcion crea un mapa atravez de folium se genera con c3ntro en buenos aires y marca en el mapa los puntos datos
 def crear_mapa(centro_mapa, bombonera, monumental, cuadrante):
     caba = folium.Map(location=centro_mapa, zoom_start=13)
     
@@ -69,10 +63,8 @@ def crear_mapa(centro_mapa, bombonera, monumental, cuadrante):
 
     return caba
 
-#Pre: recibe el mapa, una coordenada y la ruta del archivo de imagen
-#Post: la funcion crea una infraccion en el mapa marcandolo en rojo, que al clicker se ve un popup con la imagen dada, si la imgen no existe o se le da None no hay popup
-def agregar_infraccion(caba, coordenadas:list, ruta_imagen:str):
-    isFile:bool = os.path.isfile(ruta_imagen)
+def agregar_infraccion(caba, coordenadas, ruta_imagen):
+    isFile = os.path.isfile(ruta_imagen)
     if(ruta_imagen == None or isFile == False):
         folium.Marker(location = coordenadas, icon=folium.Icon(color="red", icon = "exclamation-sign")).add_to(caba)
     else:
@@ -80,17 +72,14 @@ def agregar_infraccion(caba, coordenadas:list, ruta_imagen:str):
                         <img src={ruta_imagen}  style="max-width:100%;max-height:100%">""", max_width=500), 
                         icon=folium.Icon(color="red", icon = "exclamation-sign")
                         ).add_to(caba)
-
         
-#Pre: la funcion recibe una coordenadas
-#Post: la funcion devuele un dicionario con los datos de la direccion dada a partir de las coordenadas
-def direccion_coordenadas(coordenadas:list) -> dict:
-    coordenadas_str:str = str(coordenadas[0]) + ", " + str(coordenadas[1])
-    mini_dict:dict = {}
+def direccion_coordenadas(coordenadas):
+    coordenadas_str = str(coordenadas[0]) + ", " + str(coordenadas[1])
+    mini_dict = {}
     localizador = Nominatim(user_agent="fede")
     ubicacion = localizador.reverse(coordenadas_str)
     if(ubicacion == None):
-        return(mini_dict)
+        return mini_dict 
   
     if(("road" in ubicacion.raw["address"]) and ("house_number" in ubicacion.raw["address"])):
         mini_dict["direccion"] = ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"]
@@ -107,10 +96,8 @@ def direccion_coordenadas(coordenadas:list) -> dict:
     if("country" in ubicacion.raw["address"]):
         mini_dict["pais"] = ubicacion.raw["address"]["country"]
 
-    return(mini_dict)
+    return mini_dict
 
-
-#??
 def crear_csv(data):
     headers: list = ['Timestamp','Telefono',
                     'Direccion de la infraccion',
@@ -123,9 +110,7 @@ def crear_csv(data):
         write.writerows(data)
         
    
-#Pre: recibe la ruta del archivo de audio
-#Post: deveuelve el el texto del audio
-def speech_recognition_API(ruta_audio:str) -> str:
+def speech_recognition_API(ruta_audio) -> str:
     r = sr.Recognizer()
     with sr.AudioFile(ruta_audio) as source:
         r.adjust_for_ambient_noise(source)
@@ -133,7 +118,7 @@ def speech_recognition_API(ruta_audio:str) -> str:
         texto_audio : str = r.recognize_google(audio,language='es-AR')
     return texto_audio
 
-#?
+#Punto 1
 def procesamiento_csv() -> list[dict]:
     datos_dict : list[dict] = []
     with open('datos.csv','r',newline='') as datos:
@@ -153,25 +138,46 @@ def procesamiento_csv() -> list[dict]:
             datos_dict.append(dato)
     return datos_dict
 
-#Pre: recibe la ruta del archivo de audio
-#Post: deveuelve el el texto del audio
-def procesar_radio(datos:list, coordenadas_dict:dict) -> dict:
-    for i in range(len(datos)):
+def procesar_radio(datos,coordenadas_dict):
 
-        coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
-        for i in range(2):
-            if dentro_radio(coordenadas,coordenadas_dict['bombonera'],1000):
-                print("entre")
-            if dentro_radio(coordenadas,coordenadas_dict['monumental'],1000):
-                print("entre")
-           
-#Pre: los datos y las coordeandas de del 
-#Post: devuelve si las coordenadas estan derntro del cuadrante
-def procesar_cuadrante(datos:list, coordenadas_dict:dict) -> None:
+    Patentes:dict = {}
+    with open('registro.csv','r',newline='') as R:
+        next(R)
+        cont:int = 0
+        for linea in R:
+            linea = linea.rstrip()
+            linea = linea.split(',')
+            Patentes[cont] = linea[5]
+            cont=cont+1
+
     for i in range(len(datos)):
         coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
-        if dentro_cuadrante(coordenadas_dict['cuadrante'],coordenadas):
-            print("entre")
+        #for i in range(2):
+        #    if dentro_radio(coordenadas,coordenadas_dict['bombonera'],1000):
+        #        print("entre")
+        #    if dentro_radio(coordenadas,coordenadas_dict['monumental'],1000):
+        #        print("entre")
+        if dentro_radio(coordenadas,coordenadas_dict['monumental'],1):
+            print(f"El auto: {Patentes[i]} se encuentra a 1km de la monumental")
+        elif dentro_radio(coordenadas,coordenadas_dict['bombonera'],1):
+            print(f"El auto: {Patentes[i]} se encuentra a 1km de la bombonera")
+           
+def procesar_cuadrante(datos,coordenadas_dict):
+
+    Patentes:dict = {}
+    with open('registro.csv','r',newline='') as R:
+        next(R)
+        cont:int = 0
+        for linea in R:
+            linea = linea.rstrip()
+            linea = linea.split(',')
+            Patentes[cont] = linea[5]
+            cont=cont+1
+
+    for i in range(len(datos)):
+        coordenadas : list = [float(datos[i]['coord_latitud']),float(datos[i]['coord_long'])]
+        if dentro_cuadrante(coordenadas_dict,coordenadas):
+            print(F"El auto: {Patentes[i]} se encuentra en el cuadrante")
     
 def formatear_datos_csv(datos,caba):
     datos_csv: list[list] = []
@@ -196,9 +202,7 @@ def formatear_datos_csv(datos,caba):
         
     return datos_csv
 
-#Pre: recibe la ruta del archivo de audio
-#Post: deveuelve el el texto del audio
-def grafico_xy(xy:dict) -> None:
+def grafico_xy(xy):
     gf.plot(xy.keys(), xy.values())
     gf.title('Cantidad de denuncias mensuales')
     gf.xlabel('Mes')
@@ -206,7 +210,7 @@ def grafico_xy(xy:dict) -> None:
     gf.xticks(rotation=90,fontsize=9)
     gf.show()
     
-def contador_denuncias(datos:list)-> dict:
+def contador_denuncias(datos)-> dict:
     cantidad_de_denuncias: dict = {
         'Enero':0,
         'Febrero':0,
@@ -251,11 +255,77 @@ def contador_denuncias(datos:list)-> dict:
             
     return cantidad_de_denuncias
 
-#Pre: recibe las lista de datos, el diccioanrio de coordeandas y el objeto de mapa
-#Post: la funcion muestra las opciones y procesa los inputs del usuario
-def menu(datos:list, coordenadas_dict:dict, caba) -> None:
-    opcion:int = 0
-    while not(opcion == 5):
+def Robados(Robos):
+    Patente:list=[]
+    with open(Robos,'r') as P:
+        for linea in P:
+            Patente.append(linea.rstrip())
+
+    with open('registro.csv','r',newline='') as R:
+        next(R)
+        for linea in R:
+            linea=linea.rstrip()
+            linea = linea.split(',')
+            if linea[5] in Patente:
+                print("ALERTA!!!!!")
+                print(f"Se registro un auto robado en la direccion: {linea[2]}")
+                print(f"Y en el horario: {linea[0]}")
+                print("-------------------------------------------------------------------------------------")
+
+def Busqueda_Patente(centro_mapa,coordenadas_dict):
+    print("Ingrese una patente: ")
+    patente = input()
+
+    Patentes_list:list=[]
+    with open('registro.csv','r',newline='') as R:
+        next(R)
+        for linea in R:
+            linea = linea.rstrip()
+            linea = linea.split(',')
+            Patentes_list.append(linea[5])
+
+    if patente in Patentes_list:
+
+        cont=0
+        for i in Patentes_list:
+            if i == patente:
+                index=cont
+            cont=cont+1
+
+        with open('datos.csv','r',newline='') as D:
+            next(D)
+            cont=0
+            for linea in D:
+                linea = linea.rstrip()
+                linea = linea.split(',')
+                if cont == index:
+                    ruta = linea[4]
+                    cord1 = linea[2]
+                    cord2 = linea[3]
+                    coordenadas:list=[cord1,cord2]
+                cont = cont+1
+
+        dp.Abrir_Imagen(ruta)
+        #mapa = Localizacion_Auto(,centro_mapa,coordenadas)
+        mapa = crear_mapa(coordenadas,coordenadas_dict['bombonera'],coordenadas_dict['monumental'],coordenadas_dict['cuadrante'])
+        agregar_infraccion(mapa,coordenadas,ruta)
+        mapa.save('Ubi_Auto.html')
+        webbrowser.open_new_tab('Ubi_Auto.html')
+
+    else:
+        print("La Patente ingresada no fue registrada")
+
+def Localizacion_Auto(centro_mapa,coordenadas):
+
+    ubi = folium.Map(location=centro_mapa, zoom_start=13)
+
+    folium.Marker(location = coordenadas, popup = folium.Popup(f"""<h1>Auto Seleccionado</h1><br/>"""), icon=folium.Icon(color="green", icon = "pushpin")).add_to(ubi)
+
+    return ubi
+
+def menu(datos,coordenadas_dict,caba)-> None:
+    opcion = 0
+    while not(opcion == 6):
         print(' 1. Mostrar denuncias realizadas a 1km de los estadios')
         print(' 2. Mostrar todas las infracciones dentro del centro de la ciudad')
         print(' 3. Autos robados')
@@ -263,7 +333,7 @@ def menu(datos:list, coordenadas_dict:dict, caba) -> None:
         print(' 5. Mostras mapa cantidad de denuncias recibidas')
         print(' 6. Salir')
 
-        opcion:int = int(input("Que accion desea realizar?: "))
+        opcion=int(input("Que accion desea realizar?: "))
         
         if (opcion==1):
             procesar_radio(datos,coordenadas_dict)
@@ -272,12 +342,10 @@ def menu(datos:list, coordenadas_dict:dict, caba) -> None:
             procesar_cuadrante(datos,coordenadas_dict['cuadrante'])
             
         elif (opcion==3):
-            print(' **** menu opcion 03 ****')
+            Robados('Robados.txt')
             
         elif (opcion==4):
-            print(' **** menu opcion 04 ****')
-            caba.save('index.html')
-            webbrowser.open_new_tab('index.html')
+            Busqueda_Patente(coordenadas_dict['centro_mapa'],coordenadas_dict)
                     
         elif (opcion==5):
             cantidad_de_denuncias = contador_denuncias(datos)
@@ -286,6 +354,3 @@ def menu(datos:list, coordenadas_dict:dict, caba) -> None:
             print(' **** Saliendo del menu  ****')   
         else:
             print('No existe la opcion')
-        
-
-    

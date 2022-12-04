@@ -14,105 +14,157 @@ import numpy as np
 import imutils
 import pytesseract
 
-def borrar_pantalla()->None:
-    """borrar_pantalla
-    Pre: No recibe nada
-    Post: Borra la pantalla. No devuelve nada
+def limpiar_pantalla()-> None:
+    """limpiar_pantalla
+    Pre: No requiere parametros
+    Post: Limpia la pantalla donde se este ejecutando
     """
+
     if os.name == "posix":
         os.system ("clear")
     elif os.name == "ce" or os.name == "nt" or os.name == "dos":
        os.system ("cls")
 
-def detector_placas(Imagen)->str:
-    """detector_placas
-    Pre: Debe haber una patente en la imagen con la mejor calidad posible y sin rudio
-    Post: Se devuelve un string en el que se ecuentra la patente
+def limpieza(texto_ingresado:str)->str:
+    """limpieza
+    Pre: Requiere un texto
+    Post: Devuelve el texto sin alfanumericos, exeptuando las mayusculas y los numeros
     """
-    #Cambia el tamaño de la imagen
-    img = cv2.imread(Imagen,cv2.IMREAD_COLOR)
-    img = cv2.resize(img, (400,400) )
-    #Cambia el color de la imagen a gris y luego aplica el filtro Canny
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
-    gray = cv2.bilateralFilter(gray, 13, 15, 15) 
-    edged = cv2.Canny(gray, 30, 200)
-    #Busca contornos en la imagen
-    contours = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
-    contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
-    screenCnt = None
 
-    #Busca el contorno en la imagen que se asemeje a una patente
-    for c in contours:
-        peri = cv2.arcLength(c, True)
-        approx = cv2.approxPolyDP(c, 0.018 * peri, True)
+    texto_ingresado:list = list(texto_ingresado)
+    permitidos:list = ["Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Ñ","Z","X","C","V","B","N","M","0","1","2","3","4","5","6","7","8","9"]
+    texto_devuelto:list = []
+    for letra in texto_ingresado:
+        if letra in permitidos:
+            texto_devuelto.append(letra)
+    texto_devuelto = "".join(texto_devuelto)
+
+    return texto_devuelto
+
+def aplicar_filtros(direccion_imagen:str)-> any:
+    """aplicar_filtros
+    Pre: Requiere la direccion de una imagen que exista
+    Post: Devuelve la imagen a color, en gris y tambien en gris con el filtro canny
+    """
+
+    imagen = cv2.imread(direccion_imagen, cv2.IMREAD_COLOR)
+    imagen = cv2.resize(imagen, (400,400))
+    gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY) 
+    gris = cv2.bilateralFilter(gris, 13, 15, 15) 
+    edged = cv2.Canny(gris, 30, 200)
+
+    return imagen, gris, edged
+
+def buscar_contornos(Imagen)->list:
+    """
+    Pre: Requiere una imagen
+    Post: Devuelve una lista ordenada con todos los contornos que se detectan
+    """
+
+    contornos = cv2.findContours(Imagen.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contornos = imutils.grab_contours(contornos)
+    contornos = sorted(contornos, key = cv2.contourArea, reverse = True)[:10]
+
+    return contornos
+
+def buscar_rectangulo(contornos)->any:
+    """buscar_rectangulo
+    Precondiciones: Requiere una lista con contornos de una imagen
+    Postcondiciones: Devuelve el contorno mas similar a un rectangulo
+    """
+
+    screenCnt = None
+    for cont in contornos:
+        peri = cv2.arcLength(cont, True)
+        approx = cv2.approxPolyDP(cont, 0.018*peri, True)
         if len(approx) == 4:
             screenCnt = approx
             break
-    if screenCnt is None:
-        detected = 0
-    else:
-        detected = 1
-    if detected == 1:
-        borrar_pantalla()
-        cv2.drawContours(img, [screenCnt], -1, (0, 0, 255), 3)
-        mask = np.zeros(gray.shape,np.uint8)
-        new_image = cv2.drawContours(mask,[screenCnt],0,255,-1,)
-        new_image = cv2.bitwise_and(img,img,mask=mask)
-        (x, y) = np.where(mask == 255)
-        (topx, topy) = (np.min(x), np.min(y))
-        (bottomx, bottomy) = (np.max(x), np.max(y))
-        Cropped = gray[topx:bottomx+1, topy:bottomy+1]
-        
-        #Imprime en un string a los alfanumericos que detecta de la patente
-        text = pytesseract.image_to_string(Cropped, config='--psm 11')
-    else:
-        borrar_pantalla()
-        text="ERROR"
 
-    return text
+    return screenCnt
 
-def cargar_yolo()->any:
-    """cargar_yolo
-    Pre: Deben estar los 2 archivos yolov3.weights y yolov3.cfg
-    Post: Devuelve variables de distintos tipos.
+def obtener_alfanumericos(imagen, gris, recorte)->str:
+    """obtener_alfanumericos
+    Pre: Requiere una imagen a color, la misma en gris y el recorte donde se quiere buscar los alfanumericos
+    Post: Devuelve los alfanumericos del recorte de la imagen
     """
 
-    net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
-    classes = []
-    with open("coco.names", "r") as f:
-        classes = [line.strip() for line in f.readlines()] 
+    cv2.drawContours(imagen, [recorte], -1, (0, 0, 255), 3)
+    Mask = np.zeros(gris.shape,np.uint8)
+    New_Imagen = cv2.drawContours(Mask,[recorte],0,255,-1,)
+    New_Imagen = cv2.bitwise_and(imagen,imagen,mask=Mask)
+    (x, y) = np.where(Mask == 255)
+    (topx, topy) = (np.min(x), np.min(y))
+    (bottomx, bottomy) = (np.max(x), np.max(y))
+    Cropped = gris[topx:bottomx+1, topy:bottomy+1]
+    Texto:str   = pytesseract.image_to_string(Cropped, config='--psm 11')
+
+    return Texto
+
+def obtener_patente(direccion_imagen:str)->str:
+    """obtener_patente
+    Pre: Requiere una direccion de imagen que exista
+    Post: Devuelve alfanumericos detectados en un contorno similar a un rectangulo de la imagen
+    """
     
+    imagen, gris, edged = aplicar_filtros(direccion_imagen)
+    Contornos = buscar_contornos(edged)
+    screenCnt = buscar_rectangulo(Contornos)
+    if screenCnt is None:
+        limpiar_pantalla()
+        Patente:str = "¡Error!"
+    else:
+        limpiar_pantalla()
+        Texto:str = obtener_alfanumericos(imagen, gris, screenCnt)
+        Patente:str = limpieza(Texto)
+
+    return Patente 
+ 
+def cargar_yolo(Yolo_W, Yolo_C, Coco):
+    """cargar_yolo
+    Pre: Requiere la direccion de 2 archivos para la ejecucion de la red neuronal y un archivo donde esten los nombres de los objetos que esta detecta 
+    Post: Devuelve caracteristicas al cargar yolov3
+    """
+
+    net = cv2.dnn.readNet(Yolo_W, Yolo_C)
+    classes = []
+    with open(Coco, "r") as f:
+        classes = [line.strip() for line in f.readlines()] 
     output_layers = [layer_name for layer_name in net.getUnconnectedOutLayersNames()]
     colors = np.random.uniform(0, 255, size=(len(classes), 3))
+
     return net, classes, colors, output_layers
 
-def cargar_imagen(imagen)->any:
+def cargar_imagen(Direccion_Imagen):
     """cargar_imagen
-    Pre: Debe existir la imagen
-    Post: Devuelve variables de tipo int
+    Pre: Requiere la direccion de una imagen que exita
+    Post: Devuelve la imagen y caracteristicas de la misma
     """
-    img = cv2.imread(imagen)
-    img = cv2.resize(img,(600,400))
-    height, width, channels = img.shape
-    return img, height, width, channels
 
-def detector_objetos(img, net, outputLayers):
+    Imagen = cv2.imread(Direccion_Imagen)
+    Imagen = cv2.resize(Imagen,(600,400))
+    height, width, channels = Imagen.shape
+
+    return Imagen, height, width, channels
+
+def detector_objetos(Imagen, net, outputLayers):
     """detector_objetos
-    Pre: Deben existir objetos en la imagen
-    Post: Devuelve blob, outputs
+    Pre: Requiere una imagen y caracteristicas de la misma
+    Post: Devuelve objetos de la imagen
     """
 
-    blob = cv2.dnn.blobFromImage(img, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
+    blob = cv2.dnn.blobFromImage(Imagen, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
     net.setInput(blob)
     outputs = net.forward(outputLayers)
+
     return blob, outputs
 
-def dimencion_cajas(outputs, height, width)->list:
+def dimencion_cajas(outputs, height, width):
     """dimencion_cajas
-    Pre: Recibe outputs, height, width
-    Post: Devuleve boxes, confs, class_ids todas variables de tipo list
+    Pre: Requiere la ubicacion de los objetos y caracteristicas de la imagen
+    Post: Devuelve coordenadas de cajas que contienen a cada objeto distinto
     """
+
     boxes = []
     confs = []
     class_ids = []
@@ -122,7 +174,6 @@ def dimencion_cajas(outputs, height, width)->list:
             print(scores)
             class_id = np.argmax(scores)
             conf = scores[class_id]
-            
             if conf > 0.5:
                 center_x = int(detect[0] * width)
                 center_y = int(detect[1] * height)
@@ -136,127 +187,100 @@ def dimencion_cajas(outputs, height, width)->list:
 
     return boxes, confs, class_ids
 
-def recorte(boxes, confs, class_ids, classes, img)->None:
-    """recorte
-    Pre: La imagen debe tener un auto, y este debe estar comlpleto en la misma
-    Post: Se crea una imagen con en recorte del auto en la que se ecuentra su patente
+def recorte_auto(boxes, confs, class_ids, classes, Imagen):
+    """recorte_auto
+    Pre: Requiere una imagen y coordenadas de las cajas que contienen a los objetos pertenecientes a la misma imagen
+    Post: Crea una imagen que solo contiene al auto principal de la imagen ingresada
     """
+
     indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
     font = cv2.FONT_HERSHEY_PLAIN
     try:
-        #Busca en la imagen el auto principal al que se le saco foto (el de mayor tamaño)
         tam_max = boxes[indexes[0]][2]*boxes[indexes[0]][3]
-        if tam_max<0:
-            tam_max=tam_max*-1
-
+        if tam_max < 0:
+            tam_max = tam_max*-1
         for i in range(len(boxes)):
             if i in indexes:
                 x, y, w, h = boxes[i]
                 tam = w*h
-
-                if tam<0:
-                    tam=tam*-1
+                if tam < 0:
+                    tam = tam*-1
                 if tam > tam_max:
-                    tam_max = w*h
-                    if tam_max<0:
-                        tam_max=tam_max*-1 
-
+                    tam_max = tam 
         for i in range(len(boxes)):
             if i in indexes:
                 x, y, w, h = boxes[i]
-                tam=w*h
-                
-                if tam<0:
+                tam = w*h
+                if tam < 0:
                     tam = w*h*-1
-                if tam==tam_max:
+                if tam == tam_max:
                     label = str(classes[class_ids[i]])
-                    if label=="car" or label=="motorbike" or label=="truck" or label=="bus":
-                        
-                        #Recorta el auto principal
-                        cv2.imwrite("Imagen.png",img[y:y+h,x:x+w])
+                    if label == "car" or label == "motorbike" or label == "truck" or label == "bus":
+                        cv2.imwrite("Imagen.png",Imagen[y:y+h,x:x+w])
     except:
-        print("La imagen ingresada no es correcta")
+        print("Las coordenadas no son correctas, no se puede realizar el recorte")
 
 def validacion(boxes, confs, class_ids, classes)->bool:
     """validacion
-    Pre: Recibe por parametro boxes, confs, class_ids, classes.
-    Post: Devuelve una variable de tipo bool.
+    Pre: Requiere coordenadas y el tipo de los objetos
+    Post: Devuelve True solo si algun objeto es un automovil
     """
+
     indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
-    verificacion=False
+    verificacion = False
     for i in range(len(boxes)):
         if i in indexes:
             label = str(classes[class_ids[i]])
-            #Verifica que se en la imagen se encuentre un automovil
             if label == "car" or label == "motorbike" or label == "truck" or label == "bus":
                 verificacion = True
 
     return verificacion
 
-def detector(imagen)-> bool:
-    """detector
-    Pre: La imagen debe existir.
-    Post: Devuelve una variable de tipo bool.
+def detector_auto(direccion_imagen, Yolo_W, Yolo_C, Coco):
+    """detector_auto
+    Pre: Requiere la direccion de una imagen que exista, 2 archivos para ejecutar la red neuronal y 1 archivo que contiene los nombres de los objetos reconosibles
+    Post: Devuelve True si y solo si se detecta un automovil en la imagen
     """
-    model, classes, colors, output_layers = cargar_yolo()
-    image, height, width, channels = cargar_imagen(imagen)
+    model, classes, colors, output_layers = cargar_yolo(Yolo_W, Yolo_C, Coco)
+    image, height, width, channels = cargar_imagen(direccion_imagen)
     blob, outputs = detector_objetos(image, model, output_layers)
     boxes, confs, class_ids = dimencion_cajas(outputs, height, width)
-    recorte(boxes, confs, class_ids, classes, image)
-    verificacion = validacion(boxes, confs, class_ids, classes)
+    Verificacion = validacion(boxes, confs, class_ids, classes)
+    if Verificacion == True:
+        recorte_auto(boxes, confs, class_ids, classes, image)
 
-    return verificacion
+    return Verificacion
 
-def limpieza(Text:str)->str:
-    """limpieza
-    Pre: La patente tiene letras mayusculas y se encuentra en el parametro
-    Post: Devuelve la patente
-    """
-    lista=list(Text)
-
-    permitidos=["Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Ñ","Z","X","C","V","B","N","M","0","1","2","3","4","5","6","7","8","9"]
-
-    patente:list=[]
-    for i in lista:
-        if i in permitidos:
-
-            patente.append(i)
-
-    patente="".join(patente)
-    return patente
-
-
-def patente(imagen:str)->str:
+def patente(direccion_imagen:str)->str:
     """patente
-    Pre: Recibe la ruta de la imagen
-    Post: Retorna la patente tipo str
+    Pre: Requiere la direccion de una imagen que exista
+    Post: Devuelve la patente del auto si es que esta imagen contiene un auto
     """
-    verificado = detector(imagen)
+    Yolo_W:str = "yolov3.weights"
+    Yolo_C:str = "yolov3.cfg"
+    Coco:str = "coco.names"
 
-    if verificado == True:
-        text = detector_placas("Imagen.png")
-        borrar_pantalla()
-        if text == "ERROR":
-            patente = "No se encontro una placa"
-        else:
-            patente = limpieza(text)
+    Verificado = detector_auto(direccion_imagen, Yolo_W, Yolo_C, Coco)
+    if Verificado == True:
+        Patente = obtener_patente("Imagen.png")
+        limpiar_pantalla()
     else:
-        patente = "No se ha encontrado un auto en la imagen"
+        Patente = "¡Error!"
 
-    return patente
+    return Patente
 
-
-def abrir_Imagen(imagen)->None:
-    """abrir_Imagen
-    Pre: Debe existir la imagen
-    Post: No devuelve nada
+def abrir_imagen(direccion_imagen)->None:
+    """abrir_imagen
+    Pre: Requiere la direccion de una imagen que exista
+    Post: Muestra en pantalla la imagen ingresada
     """
 
-    img = cv2.imread(imagen,cv2.IMREAD_COLOR)
-    img = cv2.resize(img, None, fx=0.4, fy=0.4)
-    cv2.imshow('Auto.jpg',img)
+    Imagen = cv2.imread(direccion_imagen,cv2.IMREAD_COLOR)
+    Imagen = cv2.resize(Imagen, None, fx=0.4, fy=0.4)
+    cv2.imshow('Auto.jpg',Imagen)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 
 def haversine(coordenada1, coordenada2)-> float:
     """haversine
@@ -572,7 +596,7 @@ def busqueda_patente(coordenadas_ciudad)->None:
                     cord2 = linea[3]
                     coordenadas:list=[cord1,cord2]
                 cont = cont+1
-        abrir_Imagen(ruta)
+        abrir_imagen(ruta)
         mapa = crear_mapa(coordenadas,coordenadas_ciudad['bombonera'],coordenadas_ciudad['monumental'],coordenadas_ciudad['cuadrante'])
         agregar_infraccion(mapa,coordenadas,ruta)
         mapa.save('Ubi_Auto.html')

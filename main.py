@@ -326,7 +326,6 @@ def dentro_cuadrante(cuadrante, coordenada)->bool:
         ):
             return True
     return False
-
 def crear_mapa(centro_mapa, bombonera, monumental, cuadrante)-> map:
     """crear_mapa
     Pre: Recibe las coordenadas de los estadios del cuandrante y las del centro del mapa.
@@ -338,12 +337,12 @@ def crear_mapa(centro_mapa, bombonera, monumental, cuadrante)-> map:
     folium.Circle(location = monumental, radius = 1000, color = "blue", fill = True).add_to(caba)
 
     folium.Marker(  location = bombonera, popup = folium.Popup("""<h1>La bombonera</h1><br/>
-                    <img src="bombonera.jpg"  style="max-width:100%;max-height:100%">""", max_width=500),
+                    <img src="geo\bombonera.jpg"  style="max-width:100%;max-height:100%">""", max_width=500),
                     icon=folium.Icon(color="blue", icon = "home")
                     ).add_to(caba)
     
     folium.Marker(  location = monumental, popup = folium.Popup("""<h1>El monumental</h1><br/>
-                    <img src="monumental.jpg"  style="max-width:100%;max-height:100%">""", max_width=500), 
+                    <img src="geo\monumental.jpg"  style="max-width:100%;max-height:100%">""", max_width=500), 
                     icon=folium.Icon(color="blue", icon = "home")
                     ).add_to(caba)
 
@@ -729,10 +728,11 @@ def main():
                 'alem_cordoba': [-34.59836493767683, -58.370976016505566]
                 }      
     }
-    denuncias = procesamiento_csv()
-    caba = crear_mapa(coordenadas_ciudad['centro_mapa'],coordenadas_ciudad['bombonera'],coordenadas_ciudad['monumental'],coordenadas_ciudad['cuadrante'])
-    datos_csv = formatear_datos_csv(denuncias,caba)
+    denuncias :list = procesamiento_csv()
+    caba :map = crear_mapa(coordenadas_ciudad['centro_mapa'],coordenadas_ciudad['bombonera'],coordenadas_ciudad['monumental'],coordenadas_ciudad['cuadrante'])
+    datos_csv :list = formatear_datos_csv(denuncias,caba)
     crear_csv(datos_csv)   
     menu(denuncias,coordenadas_ciudad)
 
 main()
+ 

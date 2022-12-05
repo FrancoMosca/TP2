@@ -13,8 +13,9 @@ import cv2
 import numpy as np
 import imutils
 import pytesseract
+from PIL import Image
 
-def limpiar_pantalla()-> None:
+def limpiar_pantalla():
     """limpiar_pantalla
     Pre: No requiere parametros
     Post: Limpia la pantalla donde se este ejecutando
@@ -41,7 +42,7 @@ def limpieza(texto_ingresado:str)->str:
 
     return texto_devuelto
 
-def aplicar_filtros(direccion_imagen:str)-> any:
+def aplicar_filtros(direccion_imagen:str)->tuple:
     """aplicar_filtros
     Pre: Requiere la direccion de una imagen que exista
     Post: Devuelve la imagen a color, en gris y tambien en gris con el filtro canny
@@ -120,14 +121,14 @@ def obtener_patente(direccion_imagen:str)->str:
 
     return Patente 
  
-def cargar_yolo(Yolo_W, Yolo_C, Coco):
+def cargar_yolo(Yolo_W:str, Yolo_C:str, Coco:str)->tuple:
     """cargar_yolo
     Pre: Requiere la direccion de 2 archivos para la ejecucion de la red neuronal y un archivo donde esten los nombres de los objetos que esta detecta 
     Post: Devuelve caracteristicas al cargar yolov3
     """
 
     net = cv2.dnn.readNet(Yolo_W, Yolo_C)
-    classes = []
+    classes:list = []
     with open(Coco, "r") as f:
         classes = [line.strip() for line in f.readlines()] 
     output_layers = [layer_name for layer_name in net.getUnconnectedOutLayersNames()]
@@ -135,7 +136,7 @@ def cargar_yolo(Yolo_W, Yolo_C, Coco):
 
     return net, classes, colors, output_layers
 
-def cargar_imagen(Direccion_Imagen):
+def cargar_imagen(Direccion_Imagen:str)->tuple:
     """cargar_imagen
     Pre: Requiere la direccion de una imagen que exita
     Post: Devuelve la imagen y caracteristicas de la misma
@@ -147,7 +148,7 @@ def cargar_imagen(Direccion_Imagen):
 
     return Imagen, height, width, channels
 
-def detector_objetos(Imagen, net, outputLayers):
+def detector_objetos(Imagen, net, outputLayers)->tuple:
     """detector_objetos
     Pre: Requiere una imagen y caracteristicas de la misma
     Post: Devuelve objetos de la imagen
@@ -159,19 +160,18 @@ def detector_objetos(Imagen, net, outputLayers):
 
     return blob, outputs
 
-def dimencion_cajas(outputs, height, width):
+def dimencion_cajas(outputs, height, width)->tuple:
     """dimencion_cajas
     Pre: Requiere la ubicacion de los objetos y caracteristicas de la imagen
     Post: Devuelve coordenadas de cajas que contienen a cada objeto distinto
     """
 
-    boxes = []
-    confs = []
-    class_ids = []
+    boxes:list = []
+    confs:list = []
+    class_ids:list = []
     for output in outputs:
         for detect in output:
             scores = detect[5:]
-            print(scores)
             class_id = np.argmax(scores)
             conf = scores[class_id]
             if conf > 0.5:
@@ -236,11 +236,12 @@ def validacion(boxes, confs, class_ids, classes)->bool:
 
     return verificacion
 
-def detector_auto(direccion_imagen, Yolo_W, Yolo_C, Coco):
+def detector_auto(direccion_imagen:str, Yolo_W:str, Yolo_C:str, Coco:str):
     """detector_auto
     Pre: Requiere la direccion de una imagen que exista, 2 archivos para ejecutar la red neuronal y 1 archivo que contiene los nombres de los objetos reconosibles
     Post: Devuelve True si y solo si se detecta un automovil en la imagen
     """
+
     model, classes, colors, output_layers = cargar_yolo(Yolo_W, Yolo_C, Coco)
     image, height, width, channels = cargar_imagen(direccion_imagen)
     blob, outputs = detector_objetos(image, model, output_layers)
@@ -269,51 +270,48 @@ def patente(direccion_imagen:str)->str:
 
     return Patente
 
-def abrir_imagen(direccion_imagen)->None:
+def abrir_imagen(direccion_imagen:str):
     """abrir_imagen
     Pre: Requiere la direccion de una imagen que exista
     Post: Muestra en pantalla la imagen ingresada
     """
 
-    Imagen = cv2.imread(direccion_imagen,cv2.IMREAD_COLOR)
-    Imagen = cv2.resize(Imagen, None, fx=0.4, fy=0.4)
-    cv2.imshow('Auto.jpg',Imagen)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #Imagen = cv2.imread(direccion_imagen,cv2.IMREAD_COLOR)
+    #Imagen = cv2.resize(Imagen, None, fx=0.4, fy=0.4)
+    #Imagen = Imagen.open(r"direccion_imagen")
+    #cv2.imshow('Auto.jpg',Imagen)
+    #cv2.waitKey()
+    #cv2.destroyAllWindows()
+    Imagen = Image.open(direccion_imagen)
+    Imagen.show()
+    Imagen.close()
 
 
-def haversine(coordenada1, coordenada2)-> float:
-    """haversine
-    Pre:
-    Post:
-    """
-    rad=math.pi/180
-    dlat=coordenada2[0] - coordenada1[0]
-    dlon=coordenada2[1] - coordenada1[1]
-    R=6372.795477598
-    a=(math.sin(rad*dlat/2))**2 + math.cos(rad*coordenada1[0])*math.cos(rad*coordenada2[0])*(math.sin(rad*dlon/2))**2
-    distancia=2*R*math.asin(math.sqrt(a))
-    return distancia
-
-
-def dentro_radio(coordenada1, coordenada2, radio) -> bool:
-    """dentro_cuadrante
+def dentro_radio(coordenada1:list, coordenada2:list, radio:int)-> bool:
+    """dentro_radio
     Pre: Recibe las coordenadas de la denuncia, las coordenadas de los estadios y
     el tamaño del radio.
     Post: Devuelve true si las coordenadas de la denuncia estan dentro del radio 
     y false si no esta dentro.
     """
-    if(haversine(coordenada1, coordenada2) <= radio):
-        return True
-    return False
+    Verificado:bool = False
+    rad:float = math.pi/180
+    dlat:float = coordenada2[0] - coordenada1[0]
+    dlon:float = coordenada2[1] - coordenada1[1]
+    R:float = 6372.795477598
+    a:float = (math.sin(rad*dlat/2))**2 + math.cos(rad*coordenada1[0])*math.cos(rad*coordenada2[0])*(math.sin(rad*dlon/2))**2
+    distancia:float = 2*R*math.asin(math.sqrt(a))
+    if(distancia <= radio):
+        Verificado = True
+    return Verificado
 
-
-def dentro_cuadrante(cuadrante, coordenada)->bool:
+def dentro_cuadrante(cuadrante:dict, coordenada:list)->bool:
     """dentro_cuadrante
     Pre: Recibe las coordenadas del cuadrante y las coordenadas de la denuncia.
     Post: Devuelve true si las coordenadas de la denuncia estan dentro del cuadrante 
     y false si no esta dentro.
     """
+    verificado:bool = False
     if( coordenada[1] > cuadrante['callao_rivadavia'][1] 
         and coordenada[1] > cuadrante['callao_cordoba'][1]
         and coordenada[1] < cuadrante['alem_rivadavia'][1] 
@@ -324,9 +322,10 @@ def dentro_cuadrante(cuadrante, coordenada)->bool:
         and coordenada[0] < cuadrante['callao_cordoba'][0] 
         and coordenada[0] < cuadrante['alem_cordoba'][0]
         ):
-            return True
-    return False
-def crear_mapa(centro_mapa, bombonera, monumental, cuadrante)-> map:
+            verificado = True
+    return verificado
+
+def crear_mapa(centro_mapa:list, bombonera:list, monumental:list, cuadrante:dict)-> map:
     """crear_mapa
     Pre: Recibe las coordenadas de los estadios del cuandrante y las del centro del mapa.
     Post: Devuelve un mapa
@@ -353,7 +352,7 @@ def crear_mapa(centro_mapa, bombonera, monumental, cuadrante)-> map:
 
     return caba
 
-def agregar_infraccion(caba, coordenadas, ruta_imagen)->None:
+def agregar_infraccion(caba:map, coordenadas:list, ruta_imagen:str):
     """agregar_infraccion
     Pre:Recibe el mapa, las coordenadas y la ruta de la imagen de la denuncia.
     Post: Agrega un simbolo al mapa en las coordenadas que recibe por parametro simbolizando una denuncia.
@@ -367,15 +366,15 @@ def agregar_infraccion(caba, coordenadas, ruta_imagen)->None:
                         icon=folium.Icon(color="red", icon = "exclamation-sign")
                         ).add_to(caba)
         
-def direccion_coordenadas(coordenadas)->dict:
+def direccion_coordenadas(coordenadas:list)->dict:
     """direccion_coordenadas
     Pre:Recibe las coordenadas de la denuncia.
     Post: Devuelve un dict que segun las coordenadas recibidas
     tiene como llave la direccion, localidad, provincia, ciudad y pais 
     con su respectivo valor.
     """
-    coordenadas_str = str(coordenadas[0]) + ", " + str(coordenadas[1])
-    mini_dict = {}
+    coordenadas_str:str = str(coordenadas[0]) + ", " + str(coordenadas[1])
+    mini_dict:dict = {}
     localizador = Nominatim(user_agent="fede")
     ubicacion = localizador.reverse(coordenadas_str)
     if(ubicacion == None):
@@ -398,7 +397,7 @@ def direccion_coordenadas(coordenadas)->dict:
 
     return mini_dict
 
-def crear_csv(registros)->None:
+def crear_csv(registros:list):
     """crear_csv
     Pre: Recibe los registros.
     Post:Crea un csv llamado registro con los headers de la lista headers
@@ -410,12 +409,13 @@ def crear_csv(registros)->None:
                     'Localidad','Provincia',
                     'Patente','descripcion texto',
                     'descripcion audio']
+
     with open('registro.csv', 'w') as f:
         write = csv.writer(f)
         write.writerow(headers)
         write.writerows(registros)
         
-def audio_a_texto(ruta_audio) -> str:
+def audio_a_texto(ruta_audio:str)->str:
     """audio_a_texto
     Pre:Recibe una ruta de audio en formato .wav
     Post:Pasa el audio por filtros y devuelve el audio
@@ -426,9 +426,10 @@ def audio_a_texto(ruta_audio) -> str:
         r.adjust_for_ambient_noise(source)
         audio : str = r.listen(source)
         texto_audio : str = r.recognize_google(audio,language='es-AR')
+
     return texto_audio
 
-def procesar_radio(denuncias,coordenadas_ciudad)->None:
+def procesar_radio(denuncias:list,coordenadas_ciudad:dict):
     """procesar_radio
     Pre: Recibe las denuncias y el dict coordenadas_ciudad.
     Post: No devuelve nada.
@@ -450,7 +451,7 @@ def procesar_radio(denuncias,coordenadas_ciudad)->None:
         elif dentro_radio(coordenadas,coordenadas_ciudad['bombonera'],1):
             print(f"El auto: {Patentes[i]} se encuentra a 1km de la bombonera")
            
-def procesar_cuadrante(denuncias,coordenadas_ciudad)->None:
+def procesar_cuadrante(denuncias:list,coordenadas_ciudad:dict):
     """procesar_cuadrante
     Pre: Recibe las denuncias y el dict coordenadas_ciudad.
     Post: No devuelve nada.
@@ -470,19 +471,23 @@ def procesar_cuadrante(denuncias,coordenadas_ciudad)->None:
         if dentro_cuadrante(coordenadas_ciudad,coordenadas):
             print(F"El auto: {Patentes[i]} se encuentra en el cuadrante")
 
-def grafico_xy(xy)->None:
+def grafico_xy(xy:dict):
     """grafico_xy
     Pre:Recibe el diccionario cantidad_de_denuncias.
     Post:Define las keys del diccionario como las variables en x
     y los valores como las variables en y, y genera un grafico con 
     esos datos. No devuelve nada.
     """
-    gf.plot(xy.keys(), xy.values())
-    gf.title('Cantidad de denuncias mensuales')
-    gf.xlabel('Mes')
-    gf.ylabel('Cantidad de denuncias')
-    gf.xticks(rotation=90,fontsize=9)
-    gf.show()
+    try:
+        gf.plot(xy.keys(), xy.values())
+        gf.title('Cantidad de denuncias mensuales')
+        gf.xlabel('Mes')
+        gf.ylabel('Cantidad de denuncias')
+        gf.xticks(rotation=90,fontsize=9)
+        print("Para seguir, cierre la imagen")
+        gf.show()
+    except:
+        print("Error controlado")
     
 def contador_denuncias(denuncias)-> dict:
     """contador_denuncias.
@@ -536,7 +541,7 @@ def contador_denuncias(denuncias)-> dict:
             
     return cantidad_de_denuncias
 
-def alertar_autos_robados(robados)->None:
+def alertar_autos_robados(robados:str):
     """alertar_autos_robados.
     Pre: Recibe un archivo csv.
     Post:Compara las patentes del archivo registro y si ecuentra alguna que
@@ -558,7 +563,7 @@ def alertar_autos_robados(robados)->None:
                 print(f"Y en el horario: {linea[0]}")
                 print("-------------------------------------------------------------------------------------")
 
-def busqueda_patente(coordenadas_ciudad)->None:
+def busqueda_patente(coordenadas_ciudad:dict):
     """busqueda_patente.
     Pre:Recibe las coordenadas de los estadios y del centro
     de la ciudad en forma de diccionario y permite al usuario ingresar
@@ -583,7 +588,7 @@ def busqueda_patente(coordenadas_ciudad)->None:
                 index: int=cont
             cont=cont+1
             
-        with open('datos.csv','r',newline='') as D:
+        with open('denuncias.csv','r',newline='') as D:
             next(D)
             cont : int=0
             for linea in D:
@@ -604,7 +609,7 @@ def busqueda_patente(coordenadas_ciudad)->None:
     else:
         print("La Patente ingresada no fue registrada")
 
-def localizacion_auto(centro_mapa,coordenadas)-> map:
+def localizacion_auto(centro_mapa:list,coordenadas:list)-> map:
     """Localizacion_Auto.
     Pre: Recibe el mapa y las coordenadas de la denuncia. 
     Post: Devuelve la ubicacion del auto denunciado en tipo de dato map.
@@ -615,7 +620,7 @@ def localizacion_auto(centro_mapa,coordenadas)-> map:
 
     return ubi
 
-def menu(denuncias,coordenadas_ciudad)-> None:
+def menu(denuncias:list, coordenadas_ciudad:dict):
     """menu.
     Pre: Recibe la lista de denuncias y las coordenadas de los estadios
     y del centro de la ciudad en forma de diccionario, da una lista de opciones
@@ -656,7 +661,7 @@ def menu(denuncias,coordenadas_ciudad)-> None:
         else:
             print('No existe la opcion')
 
-def formatear_datos_csv(denuncias,caba)->list[list]:
+def formatear_datos_csv(denuncias:list,caba:map)->list[list]:
     """formatear_datos_csv
     Pre: Recibe las denuncias la cual debe ser una lista de diccionarios
     y el mapa de la ciudad.
@@ -667,7 +672,7 @@ def formatear_datos_csv(denuncias,caba)->list[list]:
     for i in range(len(denuncias)):
         formato_csv: list = []
         coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
-        datos_coords = direccion_coordenadas(coordenadas)
+        datos_coords:dict = direccion_coordenadas(coordenadas)
         texto_audio = audio_a_texto((denuncias[i]['ruta_audio']).rstrip())
         
         formato_csv.append(denuncias[i]['Timestamp'])
@@ -717,6 +722,7 @@ def main():
     Post: Llama a la funciones procesamiento_csv,
     crear_mapa,formatear_datos_csv, crear_csv y menu.
     """
+    print("Esto puede tardar un rato....")
     coordenadas_ciudad: dict = {
             'bombonera' : [-34.63561750108096, -58.364769713435194],
             'monumental': [-34.545272094172674, -58.449752491858995],
@@ -735,4 +741,3 @@ def main():
     menu(denuncias,coordenadas_ciudad)
 
 main()
- 

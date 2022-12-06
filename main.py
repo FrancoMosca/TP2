@@ -570,9 +570,9 @@ def busqueda_patente(coordenadas_ciudad:dict):
     una patente en forma de str.
     Post:Muestra la patente agregada en el mapa, no devuelve nada.
     """
+
     print("Ingrese una patente: ")
     patente : str = input()
-
     Patentes_list:list=[]
     with open('registro.csv','r',newline='') as R:
         next(R)
@@ -620,6 +620,19 @@ def localizacion_auto(centro_mapa:list,coordenadas:list)-> map:
 
     return ubi
 
+def Es_un_Numero(s:str):
+    """
+    Pre: Requiere un str
+    Post: Devuelve True solo si el str es un numero
+    """
+    try:
+        complex(s)
+        Verificado:bool = True
+    except ValueError:
+        Verificado:bool = False
+
+    return Verificado
+
 def menu(denuncias:list, coordenadas_ciudad:dict):
     """menu.
     Pre: Recibe la lista de denuncias y las coordenadas de los estadios
@@ -630,6 +643,7 @@ def menu(denuncias:list, coordenadas_ciudad:dict):
     """
     opcion: int = 0
     while not(opcion == 6):
+        limpiar_pantalla()
         print(' 1. Mostrar denuncias realizadas a 1km de los estadios')
         print(' 2. Mostrar todas las infracciones dentro del centro de la ciudad')
         print(' 3. Autos robados')
@@ -637,29 +651,36 @@ def menu(denuncias:list, coordenadas_ciudad:dict):
         print(' 5. Mostras mapa cantidad de denuncias recibidas')
         print(' 6. Salir')
 
-        opcion=int(input("Que accion desea realizar?: "))
-        if opcion < 1 and opcion > 6:
-            opcion=int(input("Por favor ingrese un numero valido: "))
-    
-        if (opcion==1):
-            procesar_radio(denuncias,coordenadas_ciudad)
-            
-        elif (opcion==2):
-            procesar_cuadrante(denuncias,coordenadas_ciudad['cuadrante'])
-            
-        elif (opcion==3):
-            alertar_autos_robados('Robados.txt')
-            
-        elif (opcion==4):
-            busqueda_patente(coordenadas_ciudad)
-                    
-        elif (opcion==5):
-            cantidad_de_denuncias = contador_denuncias(denuncias)
-            grafico_xy(cantidad_de_denuncias)
-        elif (opcion==6):
-            print(' **** Saliendo del menu  ****')   
+        eleccion:str = input("Que accion desea realizar?: ")
+        if Es_un_Numero(eleccion):
+
+            opcion:int = int(eleccion)
+            if opcion < 1 and opcion > 6:
+                print("Por favor ingrese un numero valido: ")
+        
+            if opcion == 1:
+                procesar_radio(denuncias,coordenadas_ciudad)
+                
+            elif opcion == 2:
+                procesar_cuadrante(denuncias,coordenadas_ciudad['cuadrante'])
+                
+            elif opcion == 3:
+                alertar_autos_robados('Robados.txt')
+                
+            elif opcion == 4:
+                busqueda_patente(coordenadas_ciudad)
+                        
+            elif opcion == 5:
+                cantidad_de_denuncias = contador_denuncias(denuncias)
+                grafico_xy(cantidad_de_denuncias)
+
+            elif (opcion==6):
+                print(' **** Saliendo del menu  ****')
+
+            else:
+                print('No existe la opcion')
         else:
-            print('No existe la opcion')
+            print("Ingrese un numero")
 
 def formatear_datos_csv(denuncias:list,caba:map)->list[list]:
     """formatear_datos_csv
@@ -667,7 +688,8 @@ def formatear_datos_csv(denuncias:list,caba:map)->list[list]:
     y el mapa de la ciudad.
     Post: Recorre las denuncias y devuelve los datos pedidos en una lista
     llamada registros, tambien llama a las funciones direccion_coordenadas 
-    y speech_recognition_API para agregar esos datos a la lista"""
+    y speech_recognition_API para agregar esos datos a la lista
+    """
     registros: list[list] = []
     for i in range(len(denuncias)):
         formato_csv: list = []
@@ -685,7 +707,6 @@ def formatear_datos_csv(denuncias:list,caba:map)->list[list]:
         formato_csv.append(texto_audio)
         
         registros.append(formato_csv)
-        
         agregar_infraccion(caba, coordenadas, denuncias[i]['ruta_foto'])
         
     return registros
@@ -711,9 +732,9 @@ def procesamiento_csv() -> list[dict]:
                 "coord_long":linea[3],
                 "ruta_foto":linea[4],
                 "descripcion_texto":linea[5],
-                "ruta_audio":linea[6]
-            }
+                "ruta_audio":linea[6]}
             denuncias.append(denuncia)
+
     return denuncias
 
 def main():
@@ -732,7 +753,7 @@ def main():
                 'callao_cordoba': [-34.59964035141302, -58.392944435644694],
                 'alem_rivadavia': [-34.607710627889254, -58.370401504661324],
                 'alem_cordoba': [-34.59836493767683, -58.370976016505566]
-                }      
+                }
     }
     denuncias :list = procesamiento_csv()
     caba :map = crear_mapa(coordenadas_ciudad['centro_mapa'],coordenadas_ciudad['bombonera'],coordenadas_ciudad['monumental'],coordenadas_ciudad['cuadrante'])

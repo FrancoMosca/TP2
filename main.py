@@ -457,19 +457,22 @@ def procesar_cuadrante(denuncias:list,coordenadas_ciudad:dict):
     Post: No devuelve nada.
     """
     Patentes:dict = {}
-    with open('registro.csv','r',newline='') as R:
-        next(R)
-        cont:int = 0
-        for linea in R:
-            linea = linea.rstrip()
-            linea = linea.split(',')
-            Patentes[cont] = linea[5]
-            cont=cont+1
+    try:
+        with open('registro.csv','r',newline='') as R:
+            next(R)
+            cont:int = 0
+            for linea in R:
+                linea = linea.rstrip()
+                linea = linea.split(',')
+                Patentes[cont] = linea[5]
+                cont=cont+1
 
-    for i in range(len(denuncias)):
-        coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
-        if dentro_cuadrante(coordenadas_ciudad,coordenadas):
-            print(F"El auto: {Patentes[i]} se encuentra en el cuadrante")
+        for i in range(len(denuncias)):
+            coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
+            if dentro_cuadrante(coordenadas_ciudad,coordenadas):
+                print(F"El auto: {Patentes[i]} se encuentra en el cuadrante")
+    except IOError:
+        print("Archivo inexistente")
 
 def grafico_xy(xy:dict):
     """grafico_xy
@@ -551,17 +554,19 @@ def alertar_autos_robados(robados:str):
     with open(robados,'r') as P:
         for linea in P:
             Patente.append(linea.rstrip())
-
-    with open('registro.csv','r',newline='') as R:
-        next(R)
-        for linea in R:
-            linea=linea.rstrip()
-            linea = linea.split(',')
-            if linea[5] in Patente:
-                print("ALERTA!!!!!")
-                print(f"Se registro un auto robado en la direccion: {linea[2]}")
-                print(f"Y en el horario: {linea[0]}")
-                print("-------------------------------------------------------------------------------------")
+    try:
+        with open('registro.csv','r',newline='') as R:
+            next(R)
+            for linea in R:
+                linea=linea.rstrip()
+                linea = linea.split(',')
+                if linea[5] in Patente:
+                    print("ALERTA!!!!!")
+                    print(f"Se registro un auto robado en la direccion: {linea[2]}")
+                    print(f"Y en el horario: {linea[0]}")
+                    print("-------------------------------------------------------------------------------------")
+    except IOError:
+        print("Archivo inexistente")
 
 def busqueda_patente(coordenadas_ciudad:dict):
     """busqueda_patente.
@@ -587,24 +592,26 @@ def busqueda_patente(coordenadas_ciudad:dict):
             if i == patente:
                 index: int=cont
             cont=cont+1
-            
-        with open('denuncias.csv','r',newline='') as D:
-            next(D)
-            cont : int=0
-            for linea in D:
-                linea = linea.rstrip()
-                linea = linea.split(',')
-                if cont == index:
-                    ruta = linea[4]
-                    cord1 = linea[2]
-                    cord2 = linea[3]
-                    coordenadas:list=[cord1,cord2]
-                cont = cont+1
-        abrir_imagen(ruta)
-        mapa = crear_mapa(coordenadas,coordenadas_ciudad['bombonera'],coordenadas_ciudad['monumental'],coordenadas_ciudad['cuadrante'])
-        agregar_infraccion(mapa,coordenadas,ruta)
-        mapa.save('Ubi_Auto.html')
-        webbrowser.open_new_tab('Ubi_Auto.html')
+        try:    
+            with open('denuncias.csv','r',newline='') as D:
+                next(D)
+                cont : int=0
+                for linea in D:
+                    linea = linea.rstrip()
+                    linea = linea.split(',')
+                    if cont == index:
+                        ruta = linea[4]
+                        cord1 = linea[2]
+                        cord2 = linea[3]
+                        coordenadas:list=[cord1,cord2]
+                    cont = cont+1
+            abrir_imagen(ruta)
+            mapa = crear_mapa(coordenadas,coordenadas_ciudad['bombonera'],coordenadas_ciudad['monumental'],coordenadas_ciudad['cuadrante'])
+            agregar_infraccion(mapa,coordenadas,ruta)
+            mapa.save('Ubi_Auto.html')
+            webbrowser.open_new_tab('Ubi_Auto.html')
+        except IOError:
+            print("Archivo inexistente")
         
     else:
         print("La Patente ingresada no fue registrada")
@@ -627,11 +634,11 @@ def Es_un_Numero(s:str):
     """
     try:
         complex(s)
-        Verificado:bool = True
+        verificado:bool = True
     except ValueError:
-        Verificado:bool = False
+        verificado:bool = False
 
-    return Verificado
+    return verificado
 
 def menu(denuncias:list, coordenadas_ciudad:dict):
     """menu.
@@ -691,24 +698,26 @@ def formatear_datos_csv(denuncias:list,caba:map)->list[list]:
     y speech_recognition_API para agregar esos datos a la lista
     """
     registros: list[list] = []
-    for i in range(len(denuncias)):
-        formato_csv: list = []
-        coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
-        datos_coords:dict = direccion_coordenadas(coordenadas)
-        texto_audio = audio_a_texto((denuncias[i]['ruta_audio']).rstrip())
-        
-        formato_csv.append(denuncias[i]['Timestamp'])
-        formato_csv.append(denuncias[i]['Telefono_celular'])
-        formato_csv.append(datos_coords['direccion'])
-        formato_csv.append(datos_coords['localidad'])
-        formato_csv.append(datos_coords['provincia'])
-        formato_csv.append(patente(denuncias[i]['ruta_foto']))
-        formato_csv.append(denuncias[i]['descripcion_texto'])
-        formato_csv.append(texto_audio)
-        
-        registros.append(formato_csv)
-        agregar_infraccion(caba, coordenadas, denuncias[i]['ruta_foto'])
-        
+    try:
+        for i in range(len(denuncias)):
+            formato_csv: list = []
+            coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
+            datos_coords:dict = direccion_coordenadas(coordenadas)
+            texto_audio = audio_a_texto((denuncias[i]['ruta_audio']).rstrip())
+            
+            formato_csv.append(denuncias[i]['Timestamp'])
+            formato_csv.append(denuncias[i]['Telefono_celular'])
+            formato_csv.append(datos_coords['direccion'])
+            formato_csv.append(datos_coords['localidad'])
+            formato_csv.append(datos_coords['provincia'])
+            formato_csv.append(patente(denuncias[i]['ruta_foto']))
+            formato_csv.append(denuncias[i]['descripcion_texto'])
+            formato_csv.append(texto_audio)
+            
+            registros.append(formato_csv)
+            agregar_infraccion(caba, coordenadas, denuncias[i]['ruta_foto'])
+    except KeyError:
+        print("Archivo invalido")
     return registros
             
 def procesamiento_csv() -> list[dict]:
@@ -720,20 +729,23 @@ def procesamiento_csv() -> list[dict]:
     a una lista llamada denuncias, devuelve la list[dict] llamada denuncias. 
     """
     denuncias : list[dict] = []
-    with open('denuncias.csv','r',newline='') as archivo:
-        next(archivo)
-        for linea in archivo:
-            linea = linea.rstrip()
-            linea = linea.split(',')
-            denuncia = {
-                "Timestamp":linea[0],
-                "Telefono_celular":linea[1],
-                "coord_latitud":linea[2],
-                "coord_long":linea[3],
-                "ruta_foto":linea[4],
-                "descripcion_texto":linea[5],
-                "ruta_audio":linea[6]}
-            denuncias.append(denuncia)
+    try:
+        with open('denuncias.csv','r',newline='') as archivo:
+            next(archivo)
+            for linea in archivo:
+                linea = linea.rstrip()
+                linea = linea.split(',')
+                denuncia = {
+                    "Timestamp":linea[0],
+                    "Telefono_celular":linea[1],
+                    "coord_latitud":linea[2],
+                    "coord_long":linea[3],
+                    "ruta_foto":linea[4],
+                    "descripcion_texto":linea[5],
+                    "ruta_audio":linea[6]}
+                denuncias.append(denuncia)
+    except IOError:
+        print("Archivo inexistente")
 
     return denuncias
 

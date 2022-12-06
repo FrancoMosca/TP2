@@ -56,19 +56,19 @@ def aplicar_filtros(direccion_imagen:str)->tuple:
 
     return imagen, gris, edged
 
-def buscar_contornos(Imagen)->list:
-    """
+def buscar_contornos(imagen)->list:
+    """buscar_contornos
     Pre: Requiere una imagen
     Post: Devuelve una lista ordenada con todos los contornos que se detectan
     """
 
-    contornos = cv2.findContours(Imagen.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contornos = cv2.findContours(imagen.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contornos = imutils.grab_contours(contornos)
     contornos = sorted(contornos, key = cv2.contourArea, reverse = True)[:10]
 
     return contornos
 
-def buscar_rectangulo(contornos)->any:
+def buscar_rectangulo(contornos:list):
     """buscar_rectangulo
     Precondiciones: Requiere una lista con contornos de una imagen
     Postcondiciones: Devuelve el contorno mas similar a un rectangulo
@@ -91,16 +91,16 @@ def obtener_alfanumericos(imagen, gris, recorte)->str:
     """
 
     cv2.drawContours(imagen, [recorte], -1, (0, 0, 255), 3)
-    Mask = np.zeros(gris.shape,np.uint8)
-    New_Imagen = cv2.drawContours(Mask,[recorte],0,255,-1,)
-    New_Imagen = cv2.bitwise_and(imagen,imagen,mask=Mask)
-    (x, y) = np.where(Mask == 255)
+    mask = np.zeros(gris.shape,np.uint8)
+    new_imagen = cv2.drawContours(mask,[recorte],0,255,-1,)
+    new_imagen = cv2.bitwise_and(imagen,imagen,mask=mask)
+    (x, y) = np.where(mask == 255)
     (topx, topy) = (np.min(x), np.min(y))
     (bottomx, bottomy) = (np.max(x), np.max(y))
-    Cropped = gris[topx:bottomx+1, topy:bottomy+1]
-    Texto:str   = pytesseract.image_to_string(Cropped, config='--psm 11')
+    cropped = gris[topx:bottomx+1, topy:bottomy+1]
+    texto:str   = pytesseract.image_to_string(cropped, config='--psm 11')
 
-    return Texto
+    return texto
 
 def obtener_patente(direccion_imagen:str)->str:
     """obtener_patente
@@ -109,17 +109,17 @@ def obtener_patente(direccion_imagen:str)->str:
     """
     
     imagen, gris, edged = aplicar_filtros(direccion_imagen)
-    Contornos = buscar_contornos(edged)
-    screenCnt = buscar_rectangulo(Contornos)
+    contornos = buscar_contornos(edged)
+    screenCnt = buscar_rectangulo(contornos)
     if screenCnt is None:
         limpiar_pantalla()
-        Patente:str = "¡Error!"
+        patente:str = "¡Error!"
     else:
         limpiar_pantalla()
-        Texto:str = obtener_alfanumericos(imagen, gris, screenCnt)
-        Patente:str = limpieza(Texto)
+        texto:str = obtener_alfanumericos(imagen, gris, screenCnt)
+        patente:str = limpieza(texto)
 
-    return Patente 
+    return patente 
  
 def cargar_yolo(Yolo_W:str, Yolo_C:str, Coco:str)->tuple:
     """cargar_yolo
@@ -136,25 +136,25 @@ def cargar_yolo(Yolo_W:str, Yolo_C:str, Coco:str)->tuple:
 
     return net, classes, colors, output_layers
 
-def cargar_imagen(Direccion_Imagen:str)->tuple:
+def cargar_imagen(direccion_imagen:str)->tuple:
     """cargar_imagen
     Pre: Requiere la direccion de una imagen que exita
     Post: Devuelve la imagen y caracteristicas de la misma
     """
 
-    Imagen = cv2.imread(Direccion_Imagen)
-    Imagen = cv2.resize(Imagen,(600,400))
-    height, width, channels = Imagen.shape
+    imagen = cv2.imread(direccion_imagen)
+    imagen = cv2.resize(imagen,(600,400))
+    height, width, channels = imagen.shape
 
-    return Imagen, height, width, channels
+    return imagen, height, width, channels
 
-def detector_objetos(Imagen, net, outputLayers)->tuple:
+def detector_objetos(imagen, net, outputLayers)->tuple:
     """detector_objetos
     Pre: Requiere una imagen y caracteristicas de la misma
     Post: Devuelve objetos de la imagen
     """
 
-    blob = cv2.dnn.blobFromImage(Imagen, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
+    blob = cv2.dnn.blobFromImage(imagen, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
     net.setInput(blob)
     outputs = net.forward(outputLayers)
 
@@ -187,7 +187,7 @@ def dimencion_cajas(outputs, height, width)->tuple:
 
     return boxes, confs, class_ids
 
-def recorte_auto(boxes, confs, class_ids, classes, Imagen):
+def recorte_auto(boxes, confs, class_ids, classes, imagen):
     """recorte_auto
     Pre: Requiere una imagen y coordenadas de las cajas que contienen a los objetos pertenecientes a la misma imagen
     Post: Crea una imagen que solo contiene al auto principal de la imagen ingresada
@@ -196,13 +196,13 @@ def recorte_auto(boxes, confs, class_ids, classes, Imagen):
     indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
     font = cv2.FONT_HERSHEY_PLAIN
     try:
-        tam_max = boxes[indexes[0]][2]*boxes[indexes[0]][3]
+        tam_max:float = boxes[indexes[0]][2]*boxes[indexes[0]][3]
         if tam_max < 0:
             tam_max = tam_max*-1
         for i in range(len(boxes)):
             if i in indexes:
                 x, y, w, h = boxes[i]
-                tam = w*h
+                tam:float = w*h
                 if tam < 0:
                     tam = tam*-1
                 if tam > tam_max:
@@ -210,14 +210,15 @@ def recorte_auto(boxes, confs, class_ids, classes, Imagen):
         for i in range(len(boxes)):
             if i in indexes:
                 x, y, w, h = boxes[i]
-                tam = w*h
+                tam:float = w*h
                 if tam < 0:
                     tam = w*h*-1
                 if tam == tam_max:
-                    label = str(classes[class_ids[i]])
+                    label:str = str(classes[class_ids[i]])
                     if label == "car" or label == "motorbike" or label == "truck" or label == "bus":
-                        cv2.imwrite("Imagen.png",Imagen[y:y+h,x:x+w])
+                        cv2.imwrite("Imagen.png",imagen[y:y+h,x:x+w])
     except:
+        cv2.imwrite("Imagen.png",imagen)
         print("Las coordenadas no son correctas, no se puede realizar el recorte")
 
 def validacion(boxes, confs, class_ids, classes)->bool:
@@ -227,12 +228,12 @@ def validacion(boxes, confs, class_ids, classes)->bool:
     """
 
     indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
-    verificacion = False
+    verificacion:bool = False
     for i in range(len(boxes)):
         if i in indexes:
-            label = str(classes[class_ids[i]])
+            label:str = str(classes[class_ids[i]])
             if label == "car" or label == "motorbike" or label == "truck" or label == "bus":
-                verificacion = True
+                verificacion:bool = True
 
     return verificacion
 
@@ -257,18 +258,18 @@ def patente(direccion_imagen:str)->str:
     Pre: Requiere la direccion de una imagen que exista
     Post: Devuelve la patente del auto si es que esta imagen contiene un auto
     """
+
     Yolo_W:str = "yolov3.weights"
     Yolo_C:str = "yolov3.cfg"
     Coco:str = "coco.names"
 
-    Verificado = detector_auto(direccion_imagen, Yolo_W, Yolo_C, Coco)
-    if Verificado == True:
-        Patente = obtener_patente("Imagen.png")
-        limpiar_pantalla()
+    verificado:bool = detector_auto(direccion_imagen, Yolo_W, Yolo_C, Coco)
+    if verificado == True:
+        patente:str = obtener_patente("Imagen.png")
     else:
-        Patente = "¡Error!"
+        patente:str = "¡Error!"
 
-    return Patente
+    return patente
 
 def abrir_imagen(direccion_imagen:str):
     """abrir_imagen
@@ -276,16 +277,12 @@ def abrir_imagen(direccion_imagen:str):
     Post: Muestra en pantalla la imagen ingresada
     """
 
-    #Imagen = cv2.imread(direccion_imagen,cv2.IMREAD_COLOR)
-    #Imagen = cv2.resize(Imagen, None, fx=0.4, fy=0.4)
-    #Imagen = Imagen.open(r"direccion_imagen")
-    #cv2.imshow('Auto.jpg',Imagen)
-    #cv2.waitKey()
-    #cv2.destroyAllWindows()
-    Imagen = Image.open(direccion_imagen)
-    Imagen.show()
-    Imagen.close()
-
+    try:
+        imagen = Image.open(direccion_imagen)
+        imagen.show()
+        imagen.close()
+    except:
+        print("No existe la imagen")
 
 def dentro_radio(coordenada1:list, coordenada2:list, radio:int)-> bool:
     """dentro_radio
@@ -294,7 +291,8 @@ def dentro_radio(coordenada1:list, coordenada2:list, radio:int)-> bool:
     Post: Devuelve true si las coordenadas de la denuncia estan dentro del radio 
     y false si no esta dentro.
     """
-    Verificado:bool = False
+
+    verificado:bool = False
     rad:float = math.pi/180
     dlat:float = coordenada2[0] - coordenada1[0]
     dlon:float = coordenada2[1] - coordenada1[1]
@@ -302,8 +300,9 @@ def dentro_radio(coordenada1:list, coordenada2:list, radio:int)-> bool:
     a:float = (math.sin(rad*dlat/2))**2 + math.cos(rad*coordenada1[0])*math.cos(rad*coordenada2[0])*(math.sin(rad*dlon/2))**2
     distancia:float = 2*R*math.asin(math.sqrt(a))
     if(distancia <= radio):
-        Verificado = True
-    return Verificado
+        verificado = True
+
+    return verificado
 
 def dentro_cuadrante(cuadrante:dict, coordenada:list)->bool:
     """dentro_cuadrante
@@ -311,6 +310,7 @@ def dentro_cuadrante(cuadrante:dict, coordenada:list)->bool:
     Post: Devuelve true si las coordenadas de la denuncia estan dentro del cuadrante 
     y false si no esta dentro.
     """
+
     verificado:bool = False
     if( coordenada[1] > cuadrante['callao_rivadavia'][1] 
         and coordenada[1] > cuadrante['callao_cordoba'][1]
@@ -322,29 +322,27 @@ def dentro_cuadrante(cuadrante:dict, coordenada:list)->bool:
         and coordenada[0] < cuadrante['callao_cordoba'][0] 
         and coordenada[0] < cuadrante['alem_cordoba'][0]
         ):
-            verificado = True
+            verificado:bool = True
+
     return verificado
 
-def crear_mapa(centro_mapa:list, bombonera:list, monumental:list, cuadrante:dict)-> map:
+def crear_mapa(centro_mapa:list, bombonera:list, monumental:list, cuadrante:dict)->map:
     """crear_mapa
     Pre: Recibe las coordenadas de los estadios del cuandrante y las del centro del mapa.
     Post: Devuelve un mapa
     """
+
     caba : map= folium.Map(location=centro_mapa, zoom_start=13)
-    
     folium.Circle(location = bombonera, radius = 1000, color = "blue", fill = True).add_to(caba)
     folium.Circle(location = monumental, radius = 1000, color = "blue", fill = True).add_to(caba)
-
     folium.Marker(  location = bombonera, popup = folium.Popup("""<h1>La bombonera</h1><br/>
-                    <img src="geo\bombonera.jpg"  style="max-width:100%;max-height:100%">""", max_width=500),
+                    <img src="bombonera.jpg"  style="max-width:100%;max-height:100%">""", max_width=500),
                     icon=folium.Icon(color="blue", icon = "home")
                     ).add_to(caba)
-    
     folium.Marker(  location = monumental, popup = folium.Popup("""<h1>El monumental</h1><br/>
-                    <img src="geo\monumental.jpg"  style="max-width:100%;max-height:100%">""", max_width=500), 
+                    <img src="monumental.jpg"  style="max-width:100%;max-height:100%">""", max_width=500), 
                     icon=folium.Icon(color="blue", icon = "home")
                     ).add_to(caba)
-
     folium.Marker(location = cuadrante['callao_rivadavia'], popup = folium.Popup(f"""<h1>Callao y Rivadavia</h1><br/>"""), icon=folium.Icon(color="green", icon = "pushpin")).add_to(caba)
     folium.Marker(location = cuadrante['callao_cordoba'], popup = folium.Popup(f"""<h1>Callao y Cordoba</h1><br/>"""), icon=folium.Icon(color="green", icon = "pushpin")).add_to(caba)
     folium.Marker(location = cuadrante['alem_rivadavia'], popup = folium.Popup(f"""<h1>Alem y Rivadavia</h1><br/>"""), icon=folium.Icon(color="green", icon = "pushpin")).add_to(caba)
@@ -357,6 +355,7 @@ def agregar_infraccion(caba:map, coordenadas:list, ruta_imagen:str):
     Pre:Recibe el mapa, las coordenadas y la ruta de la imagen de la denuncia.
     Post: Agrega un simbolo al mapa en las coordenadas que recibe por parametro simbolizando una denuncia.
     """
+
     isFile : bool= os.path.isfile(ruta_imagen)
     if(ruta_imagen == None or isFile == False):
         folium.Marker(location = coordenadas, icon=folium.Icon(color="red", icon = "exclamation-sign")).add_to(caba)
@@ -373,27 +372,27 @@ def direccion_coordenadas(coordenadas:list)->dict:
     tiene como llave la direccion, localidad, provincia, ciudad y pais 
     con su respectivo valor.
     """
+
     coordenadas_str:str = str(coordenadas[0]) + ", " + str(coordenadas[1])
     mini_dict:dict = {}
     localizador = Nominatim(user_agent="fede")
     ubicacion = localizador.reverse(coordenadas_str)
-    if(ubicacion == None):
-        return mini_dict 
-  
-    if(("road" in ubicacion.raw["address"]) and ("house_number" in ubicacion.raw["address"])):
-        mini_dict["direccion"] = ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"]
+    if(ubicacion != None):
 
-    if("suburb" in ubicacion.raw["address"]):
-        mini_dict["localidad"] = ubicacion.raw["address"]["suburb"]
+        if(("road" in ubicacion.raw["address"]) and ("house_number" in ubicacion.raw["address"])):
+            mini_dict["direccion"] = ubicacion.raw["address"]["road"] + " " + ubicacion.raw["address"]["house_number"]
 
-    if("state" in ubicacion.raw["address"]):
-        mini_dict["provincia"] = ubicacion.raw["address"]["state"]
+        if("suburb" in ubicacion.raw["address"]):
+            mini_dict["localidad"] = ubicacion.raw["address"]["suburb"]
 
-    if("city" in ubicacion.raw["address"]):
-        mini_dict["ciudad"] = ubicacion.raw["address"]["city"]
+        if("state" in ubicacion.raw["address"]):
+            mini_dict["provincia"] = ubicacion.raw["address"]["state"]
 
-    if("country" in ubicacion.raw["address"]):
-        mini_dict["pais"] = ubicacion.raw["address"]["country"]
+        if("city" in ubicacion.raw["address"]):
+            mini_dict["ciudad"] = ubicacion.raw["address"]["city"]
+
+        if("country" in ubicacion.raw["address"]):
+            mini_dict["pais"] = ubicacion.raw["address"]["country"]
 
     return mini_dict
 
@@ -421,11 +420,14 @@ def audio_a_texto(ruta_audio:str)->str:
     Post:Pasa el audio por filtros y devuelve el audio
     escrito como texto en formato str.
     """
-    r = sr.Recognizer()
-    with sr.AudioFile(ruta_audio) as source:
-        r.adjust_for_ambient_noise(source)
-        audio : str = r.listen(source)
-        texto_audio : str = r.recognize_google(audio,language='es-AR')
+    try:
+        r = sr.Recognizer()
+        with sr.AudioFile(ruta_audio) as source:
+            r.adjust_for_ambient_noise(source)
+            audio : str = r.listen(source)
+            texto_audio : str = r.recognize_google(audio,language='es-AR')
+    except:
+        texto_audio:str = "Error"
 
     return texto_audio
 
@@ -445,11 +447,12 @@ def procesar_radio(denuncias:list,coordenadas_ciudad:dict):
             cont=cont+1
 
     for i in range(len(denuncias)):
-        coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
-        if dentro_radio(coordenadas,coordenadas_ciudad['monumental'],1):
-            print(f"El auto: {Patentes[i]} se encuentra a 1km de la monumental")
-        elif dentro_radio(coordenadas,coordenadas_ciudad['bombonera'],1):
-            print(f"El auto: {Patentes[i]} se encuentra a 1km de la bombonera")
+        if Patentes[i] != None and Patentes[i] != "¡Error!" and Patentes != "Error" and Patentes[i] != "":
+            coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
+            if dentro_radio(coordenadas,coordenadas_ciudad['monumental'],1):
+                print(f"El auto: {Patentes[i]} se encuentra a 1km de la monumental")
+            elif dentro_radio(coordenadas,coordenadas_ciudad['bombonera'],1):
+                print(f"El auto: {Patentes[i]} se encuentra a 1km de la bombonera")
            
 def procesar_cuadrante(denuncias:list,coordenadas_ciudad:dict):
     """procesar_cuadrante
@@ -457,22 +460,20 @@ def procesar_cuadrante(denuncias:list,coordenadas_ciudad:dict):
     Post: No devuelve nada.
     """
     Patentes:dict = {}
-    try:
-        with open('registro.csv','r',newline='') as R:
-            next(R)
-            cont:int = 0
-            for linea in R:
-                linea = linea.rstrip()
-                linea = linea.split(',')
-                Patentes[cont] = linea[5]
-                cont=cont+1
+    with open('registro.csv','r',newline='') as R:
+        next(R)
+        cont:int = 0
+        for linea in R:
+            linea = linea.rstrip()
+            linea = linea.split(',')
+            Patentes[cont] = linea[5]
+            cont=cont+1
 
-        for i in range(len(denuncias)):
+    for i in range(len(denuncias)):
+        if Patentes[i] != None and Patentes[i] != "¡Error!" and Patentes != "Error" and Patentes[i] != "":
             coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
             if dentro_cuadrante(coordenadas_ciudad,coordenadas):
                 print(F"El auto: {Patentes[i]} se encuentra en el cuadrante")
-    except IOError:
-        print("Archivo inexistente")
 
 def grafico_xy(xy:dict):
     """grafico_xy
@@ -554,19 +555,17 @@ def alertar_autos_robados(robados:str):
     with open(robados,'r') as P:
         for linea in P:
             Patente.append(linea.rstrip())
-    try:
-        with open('registro.csv','r',newline='') as R:
-            next(R)
-            for linea in R:
-                linea=linea.rstrip()
-                linea = linea.split(',')
-                if linea[5] in Patente:
-                    print("ALERTA!!!!!")
-                    print(f"Se registro un auto robado en la direccion: {linea[2]}")
-                    print(f"Y en el horario: {linea[0]}")
-                    print("-------------------------------------------------------------------------------------")
-    except IOError:
-        print("Archivo inexistente")
+
+    with open('registro.csv','r',newline='') as R:
+        next(R)
+        for linea in R:
+            linea=linea.rstrip()
+            linea = linea.split(',')
+            if linea[5] in Patente:
+                print("ALERTA!!!!!")
+                print(f"Se registro un auto robado en la direccion: {linea[2]}")
+                print(f"Y en el horario: {linea[0]}")
+                print("-------------------------------------------------------------------------------------")
 
 def busqueda_patente(coordenadas_ciudad:dict):
     """busqueda_patente.
@@ -592,26 +591,24 @@ def busqueda_patente(coordenadas_ciudad:dict):
             if i == patente:
                 index: int=cont
             cont=cont+1
-        try:    
-            with open('denuncias.csv','r',newline='') as D:
-                next(D)
-                cont : int=0
-                for linea in D:
-                    linea = linea.rstrip()
-                    linea = linea.split(',')
-                    if cont == index:
-                        ruta = linea[4]
-                        cord1 = linea[2]
-                        cord2 = linea[3]
-                        coordenadas:list=[cord1,cord2]
-                    cont = cont+1
-            abrir_imagen(ruta)
-            mapa = crear_mapa(coordenadas,coordenadas_ciudad['bombonera'],coordenadas_ciudad['monumental'],coordenadas_ciudad['cuadrante'])
-            agregar_infraccion(mapa,coordenadas,ruta)
-            mapa.save('Ubi_Auto.html')
-            webbrowser.open_new_tab('Ubi_Auto.html')
-        except IOError:
-            print("Archivo inexistente")
+            
+        with open('denuncias.csv','r',newline='') as D:
+            next(D)
+            cont : int=0
+            for linea in D:
+                linea = linea.rstrip()
+                linea = linea.split(',')
+                if cont == index:
+                    ruta = linea[4]
+                    cord1 = linea[2]
+                    cord2 = linea[3]
+                    coordenadas:list=[cord1,cord2]
+                cont = cont+1
+        abrir_imagen(ruta)
+        mapa = crear_mapa(coordenadas,coordenadas_ciudad['bombonera'],coordenadas_ciudad['monumental'],coordenadas_ciudad['cuadrante'])
+        agregar_infraccion(mapa,coordenadas,ruta)
+        mapa.save('Ubi_Auto.html')
+        webbrowser.open_new_tab('Ubi_Auto.html')
         
     else:
         print("La Patente ingresada no fue registrada")
@@ -634,11 +631,11 @@ def Es_un_Numero(s:str):
     """
     try:
         complex(s)
-        verificado:bool = True
+        Verificado:bool = True
     except ValueError:
-        verificado:bool = False
+        Verificado:bool = False
 
-    return verificado
+    return Verificado
 
 def menu(denuncias:list, coordenadas_ciudad:dict):
     """menu.
@@ -688,6 +685,7 @@ def menu(denuncias:list, coordenadas_ciudad:dict):
                 print('No existe la opcion')
         else:
             print("Ingrese un numero")
+        input()
 
 def formatear_datos_csv(denuncias:list,caba:map)->list[list]:
     """formatear_datos_csv
@@ -698,26 +696,24 @@ def formatear_datos_csv(denuncias:list,caba:map)->list[list]:
     y speech_recognition_API para agregar esos datos a la lista
     """
     registros: list[list] = []
-    try:
-        for i in range(len(denuncias)):
-            formato_csv: list = []
-            coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
-            datos_coords:dict = direccion_coordenadas(coordenadas)
-            texto_audio = audio_a_texto((denuncias[i]['ruta_audio']).rstrip())
-            
-            formato_csv.append(denuncias[i]['Timestamp'])
-            formato_csv.append(denuncias[i]['Telefono_celular'])
-            formato_csv.append(datos_coords['direccion'])
-            formato_csv.append(datos_coords['localidad'])
-            formato_csv.append(datos_coords['provincia'])
-            formato_csv.append(patente(denuncias[i]['ruta_foto']))
-            formato_csv.append(denuncias[i]['descripcion_texto'])
-            formato_csv.append(texto_audio)
-            
-            registros.append(formato_csv)
-            agregar_infraccion(caba, coordenadas, denuncias[i]['ruta_foto'])
-    except KeyError:
-        print("Archivo invalido")
+    for i in range(len(denuncias)):
+        formato_csv: list = []
+        coordenadas : list = [float(denuncias[i]['coord_latitud']),float(denuncias[i]['coord_long'])]
+        datos_coords:dict = direccion_coordenadas(coordenadas)
+        texto_audio = audio_a_texto((denuncias[i]['ruta_audio']).rstrip())
+        
+        formato_csv.append(denuncias[i]['Timestamp'])
+        formato_csv.append(denuncias[i]['Telefono_celular'])
+        formato_csv.append(datos_coords['direccion'])
+        formato_csv.append(datos_coords['localidad'])
+        formato_csv.append(datos_coords['provincia'])
+        formato_csv.append(patente(denuncias[i]['ruta_foto']))
+        formato_csv.append(denuncias[i]['descripcion_texto'])
+        formato_csv.append(texto_audio)
+        
+        registros.append(formato_csv)
+        agregar_infraccion(caba, coordenadas, denuncias[i]['ruta_foto'])
+        
     return registros
             
 def procesamiento_csv() -> list[dict]:
@@ -729,23 +725,20 @@ def procesamiento_csv() -> list[dict]:
     a una lista llamada denuncias, devuelve la list[dict] llamada denuncias. 
     """
     denuncias : list[dict] = []
-    try:
-        with open('denuncias.csv','r',newline='') as archivo:
-            next(archivo)
-            for linea in archivo:
-                linea = linea.rstrip()
-                linea = linea.split(',')
-                denuncia = {
-                    "Timestamp":linea[0],
-                    "Telefono_celular":linea[1],
-                    "coord_latitud":linea[2],
-                    "coord_long":linea[3],
-                    "ruta_foto":linea[4],
-                    "descripcion_texto":linea[5],
-                    "ruta_audio":linea[6]}
-                denuncias.append(denuncia)
-    except IOError:
-        print("Archivo inexistente")
+    with open('denuncias.csv','r',newline='') as archivo:
+        next(archivo)
+        for linea in archivo:
+            linea = linea.rstrip()
+            linea = linea.split(',')
+            denuncia = {
+                "Timestamp":linea[0],
+                "Telefono_celular":linea[1],
+                "coord_latitud":linea[2],
+                "coord_long":linea[3],
+                "ruta_foto":linea[4],
+                "descripcion_texto":linea[5],
+                "ruta_audio":linea[6]}
+            denuncias.append(denuncia)
 
     return denuncias
 
